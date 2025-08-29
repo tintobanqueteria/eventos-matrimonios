@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>Eventos de la Semana - Banquetera</title>
     <style>
         * {
@@ -12,10 +12,12 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 20px;
+            padding: 10px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         .container {
@@ -57,6 +59,8 @@
             border: none;
             box-shadow: 0 3px 10px rgba(0,0,0,0.2);
             z-index: 1000;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
 
         .password-modal {
@@ -91,7 +95,7 @@
             padding: 15px;
             border: 2px solid #e9ecef;
             border-radius: 10px;
-            font-size: 1.1em;
+            font-size: 16px; /* Prevents zoom on iOS */
             margin: 20px 0;
             text-align: center;
         }
@@ -137,7 +141,7 @@
 
         .events-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 25px;
             margin-bottom: 40px;
         }
@@ -150,10 +154,12 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
             cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .event-card:hover {
-            transform: translateY(-10px);
+        .event-card:hover,
+        .event-card:active {
+            transform: translateY(-5px);
             box-shadow: 0 20px 50px rgba(0,0,0,0.15);
             border-color: #ff6b6b;
         }
@@ -202,7 +208,7 @@
 
         .roles-container {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
             gap: 15px;
             margin-top: 25px;
         }
@@ -217,9 +223,12 @@
             text-align: center;
             font-weight: bold;
             color: #495057;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
 
-        .role-button:hover {
+        .role-button:hover,
+        .role-button:active {
             transform: translateY(-3px);
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
@@ -229,7 +238,8 @@
             color: #007bff;
         }
 
-        .role-button.supervisor:hover {
+        .role-button.supervisor:hover,
+        .role-button.supervisor:active {
             background: linear-gradient(135deg, #007bff, #0056b3);
             color: white;
             box-shadow: 0 10px 25px rgba(0, 123, 255, 0.3);
@@ -240,7 +250,8 @@
             color: #28a745;
         }
 
-        .role-button.supermetre:hover {
+        .role-button.supermetre:hover,
+        .role-button.supermetre:active {
             background: linear-gradient(135deg, #28a745, #1e7e34);
             color: white;
             box-shadow: 0 10px 25px rgba(40, 167, 69, 0.3);
@@ -251,7 +262,8 @@
             color: #dc3545;
         }
 
-        .role-button.cocina:hover {
+        .role-button.cocina:hover,
+        .role-button.cocina:active {
             background: linear-gradient(135deg, #dc3545, #c82333);
             color: white;
             box-shadow: 0 10px 25px rgba(220, 53, 69, 0.3);
@@ -278,6 +290,7 @@
             background: rgba(0,0,0,0.8);
             z-index: 2000;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .modal.active {
@@ -295,6 +308,7 @@
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
             position: relative;
         }
 
@@ -320,9 +334,12 @@
             font-size: 2em;
             cursor: pointer;
             color: #999;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
 
-        .close-btn:hover {
+        .close-btn:hover,
+        .close-btn:active {
             color: #333;
         }
 
@@ -342,7 +359,8 @@
             transition: all 0.3s ease;
         }
 
-        .document-item:hover {
+        .document-item:hover,
+        .document-item:active {
             transform: translateX(5px);
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
@@ -376,9 +394,12 @@
             cursor: pointer;
             font-weight: bold;
             transition: all 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
 
-        .view-btn:hover {
+        .view-btn:hover,
+        .view-btn:active {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
         }
@@ -410,7 +431,7 @@
             border-left: 4px solid #007bff;
         }
 
-        /* Estilos del panel de administración */
+        /* Admin panel styles */
         .form-group {
             margin-bottom: 25px;
         }
@@ -429,7 +450,7 @@
             padding: 12px 15px;
             border: 2px solid #e9ecef;
             border-radius: 10px;
-            font-size: 1em;
+            font-size: 16px; /* Prevents zoom on iOS */
             transition: border-color 0.3s ease;
         }
 
@@ -443,12 +464,14 @@
             padding: 12px 30px;
             border: none;
             border-radius: 10px;
-            font-size: 1em;
+            font-size: 16px; /* Prevents zoom on iOS */
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
             margin-right: 10px;
             margin-bottom: 10px;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
 
         .btn-primary {
@@ -476,7 +499,8 @@
             color: white;
         }
 
-        .btn:hover {
+        .btn:hover,
+        .btn:active {
             transform: translateY(-2px);
         }
 
@@ -488,9 +512,11 @@
             background: #f8f9fa;
             cursor: pointer;
             transition: all 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .file-upload-area:hover {
+        .file-upload-area:hover,
+        .file-upload-area:active {
             border-color: #ff6b6b;
             background: rgba(255, 107, 107, 0.1);
         }
@@ -533,7 +559,6 @@
             border: 2px solid #e9ecef;
         }
 
-        /* Nuevos estilos para asignación manual de documentos */
         .document-assignment {
             margin-top: 20px;
             padding: 20px;
@@ -560,6 +585,7 @@
             display: flex;
             gap: 20px;
             align-items: center;
+            flex-wrap: wrap;
         }
 
         .role-checkbox {
@@ -572,6 +598,7 @@
             border-radius: 25px;
             cursor: pointer;
             transition: all 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .role-checkbox input[type="checkbox"] {
@@ -615,6 +642,7 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 0.8em;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .edit-mode {
@@ -626,13 +654,14 @@
             color: #856404;
         }
 
+        /* Mobile optimizations */
         @media (max-width: 768px) {
             body {
-                padding: 10px;
+                padding: 5px;
             }
 
             .container {
-                border-radius: 15px;
+                border-radius: 10px;
             }
 
             .header {
@@ -640,7 +669,11 @@
             }
 
             .header h1 {
-                font-size: 2em;
+                font-size: 1.8em;
+            }
+
+            .header p {
+                font-size: 1em;
             }
 
             .main-content {
@@ -653,11 +686,11 @@
 
             .events-grid {
                 grid-template-columns: 1fr;
-                gap: 20px;
+                gap: 15px;
             }
 
             .event-card {
-                padding: 20px;
+                padding: 15px;
                 margin-bottom: 0;
             }
 
@@ -665,17 +698,19 @@
                 flex-direction: column;
                 align-items: stretch;
                 gap: 10px;
-            }
-
-            .event-title {
-                font-size: 1.4em;
                 text-align: center;
             }
 
+            .event-title {
+                font-size: 1.3em;
+                order: 1;
+            }
+
             .event-date {
+                order: 2;
                 align-self: center;
                 padding: 6px 12px;
-                font-size: 0.85em;
+                font-size: 0.8em;
             }
             
             .roles-container {
@@ -684,12 +719,12 @@
             }
 
             .role-button {
-                padding: 18px;
+                padding: 15px;
                 font-size: 1em;
             }
 
             .role-emoji {
-                font-size: 2.2em;
+                font-size: 2em;
             }
             
             .modal-content {
@@ -699,7 +734,7 @@
             }
 
             .modal-title {
-                font-size: 1.6em;
+                font-size: 1.5em;
             }
 
             .document-item {
@@ -711,19 +746,22 @@
 
             .document-info {
                 justify-content: center;
+                flex-direction: column;
+                text-align: center;
             }
 
             .view-btn {
                 width: 100%;
-                padding: 12px;
+                padding: 15px;
             }
             
             .admin-toggle {
-                position: static;
-                margin-bottom: 15px;
+                position: relative;
+                top: 0;
+                right: 0;
+                margin: 10px auto;
                 display: block;
-                text-align: center;
-                width: auto;
+                width: fit-content;
                 font-size: 0.9em;
                 padding: 12px 20px;
             }
@@ -740,15 +778,11 @@
             }
 
             .btn {
-                margin-right: 5px;
+                width: 100%;
+                margin-right: 0;
                 margin-bottom: 8px;
-                padding: 10px 20px;
-                font-size: 0.9em;
-            }
-
-            .form-group input,
-            .form-group textarea {
-                font-size: 16px; /* Evita zoom en iOS */
+                padding: 15px 20px;
+                font-size: 16px;
             }
 
             .week-info {
@@ -756,7 +790,7 @@
             }
 
             .week-info h2 {
-                font-size: 1.6em;
+                font-size: 1.5em;
             }
 
             .admin-event-card {
@@ -778,11 +812,6 @@
                 margin: 15px;
             }
 
-            .password-input {
-                font-size: 16px; /* Evita zoom en iOS */
-            }
-
-            /* Mejoras adicionales para móvil */
             .event-info p {
                 font-size: 1em;
                 flex-wrap: wrap;
@@ -794,11 +823,11 @@
             }
 
             .empty-state {
-                padding: 40px 15px;
+                padding: 30px 15px;
             }
 
             .empty-state .emoji {
-                font-size: 4em;
+                font-size: 3em;
             }
 
             .file-upload-area {
@@ -812,6 +841,7 @@
             .assignment-header {
                 flex-direction: column;
                 gap: 10px;
+                text-align: center;
             }
 
             .admin-tools {
@@ -820,19 +850,57 @@
 
             .debug-info {
                 text-align: left;
+                font-size: 0.75em;
+            }
+
+            /* Fix admin tools buttons on mobile */
+            .admin-tools > div {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .admin-tools .btn {
+                margin: 0;
+                width: 100%;
+            }
+        }
+
+        /* iOS specific fixes */
+        @supports (-webkit-overflow-scrolling: touch) {
+            .modal {
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .modal-content {
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            /* Fix iOS bounce scroll */
+            body {
+                position: fixed;
+                overflow: hidden;
+                width: 100%;
+            }
+            
+            body.modal-open {
+                position: static;
+                overflow: auto;
             }
         }
     </style>
 </head>
 <body>
-    <button class="admin-toggle" onclick="requestAdminAccess()">🔧 Admin</button>
+    <div class="admin-toggle-container" style="text-align: center; padding: 10px;">
+        <button class="admin-toggle" onclick="requestAdminAccess()">🔧 Admin</button>
+    </div>
 
     <!-- Modal para contraseña -->
     <div id="passwordModal" class="password-modal">
         <div class="password-content">
             <h3 style="color: #ff6b6b; margin-bottom: 15px;">🔐 Acceso Administrativo</h3>
             <p style="color: #666; margin-bottom: 20px;">Introduce la contraseña para acceder al panel administrativo</p>
-            <input type="password" id="passwordInput" class="password-input" placeholder="Contraseña" maxlength="20">
+            <input type="password" id="passwordInput" class="password-input" placeholder="Contraseña" maxlength="20" autocomplete="off">
             <div style="margin-top: 20px;">
                 <button class="btn btn-primary" onclick="checkPassword()" style="margin-right: 10px;">✅ Acceder</button>
                 <button class="btn btn-secondary" onclick="closePasswordModal()">❌ Cancelar</button>
@@ -862,7 +930,7 @@
                 </div>
                 <div id="shareLink" style="margin-top: 15px; display: none; background: #e7f3ff; padding: 15px; border-radius: 10px;">
                     <p><strong>📱 Link para Móviles:</strong></p>
-                    <input type="text" id="shareLinkInput" readonly style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; margin: 10px 0;">
+                    <input type="text" id="shareLinkInput" readonly style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; margin: 10px 0; font-size: 14px;">
                     <div style="text-align: center;">
                         <button class="btn btn-success" onclick="copyShareLink()">📋 Copiar Link</button>
                         <button class="btn btn-secondary" onclick="hideShareLink()">❌ Cerrar</button>
@@ -881,6 +949,7 @@
                 <p><strong>Total eventos:</strong> <span id="eventCount">0</span></p>
                 <p><strong>Total documentos:</strong> <span id="docCount">0</span></p>
                 <p><strong>LocalStorage disponible:</strong> <span id="storageStatus">Verificando...</span></p>
+                <p><strong>Navegador:</strong> <span id="browserInfo">-</span></p>
             </div>
 
             <div id="editEventContainer" style="display: none;" class="edit-mode">
@@ -889,16 +958,6 @@
             </div>
 
             <form id="eventForm">
-                <div class="form-group">
-                    <label for="eventCenter">🏛️ Centro de Eventos</label>
-                    <input type="text" id="eventCenter" placeholder="Escribe el nombre del centro: Ej. Salón Principal, Terraza Garden, etc." required>
-                </div>
-
-                <div class="form-group">
-                    <label for="eventDate">📅 Fecha del Evento</label>
-                    <input type="date" id="eventDate" required>
-                </div>
-
                 <div class="form-group">
                     <label for="eventTime">⏰ Hora de Inicio</label>
                     <input type="time" id="eventTime" value="19:00" required>
@@ -977,19 +1036,24 @@
         let isAuthenticated = false;
         const ADMIN_PASSWORD = 'Pagoda1234';
 
-        // Test localStorage availability
+        // Mobile detection
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+        // Improved localStorage detection
         function isLocalStorageAvailable() {
             try {
-                const test = 'test';
+                const test = '__localStorage_test__';
                 localStorage.setItem(test, test);
                 localStorage.removeItem(test);
                 return true;
             } catch (e) {
+                console.warn('LocalStorage not available:', e.name);
                 return false;
             }
         }
 
-        // Safe localStorage operations
+        // Safe localStorage operations with better error handling
         function safeGetFromStorage(key) {
             try {
                 if (!isLocalStorageAvailable()) {
@@ -997,7 +1061,10 @@
                     return [];
                 }
                 const data = localStorage.getItem(key);
-                return data ? JSON.parse(data) : [];
+                if (!data) return [];
+                
+                const parsed = JSON.parse(data);
+                return Array.isArray(parsed) ? parsed : [];
             } catch (e) {
                 console.error('Error reading from localStorage:', e);
                 return [];
@@ -1010,57 +1077,82 @@
                     console.warn('localStorage not available, data will not persist');
                     return false;
                 }
+                
+                // Validate data before storing
+                if (!Array.isArray(data)) {
+                    console.error('Data must be an array');
+                    return false;
+                }
+                
                 localStorage.setItem(key, JSON.stringify(data));
                 return true;
             } catch (e) {
                 console.error('Error writing to localStorage:', e);
+                if (e.name === 'QuotaExceededError') {
+                    alert('Espacio de almacenamiento lleno. Elimina eventos antiguos.');
+                }
                 return false;
             }
         }
 
-        // Inicializar
+        // Enhanced initialization with better mobile support
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded, initializing app...');
+            console.log('Mobile device:', isMobile);
+            console.log('iOS device:', isIOS);
             
-            // Verificar localStorage
+            // Mobile-specific optimizations
+            if (isMobile) {
+                document.body.addEventListener('touchstart', function() {}, { passive: true });
+                
+                // Prevent iOS bounce scroll
+                if (isIOS) {
+                    document.addEventListener('touchmove', function(e) {
+                        if (e.target.closest('.modal-content, .admin-panel')) return;
+                        e.preventDefault();
+                    }, { passive: false });
+                }
+            }
+            
+            // Check localStorage
             const storageAvailable = isLocalStorageAvailable();
-            document.getElementById('storageStatus').textContent = storageAvailable ? 'Disponible' : 'No disponible';
+            const statusEl = document.getElementById('storageStatus');
+            const browserEl = document.getElementById('browserInfo');
+            
+            if (statusEl) statusEl.textContent = storageAvailable ? 'Disponible' : 'No disponible';
+            if (browserEl) browserEl.textContent = navigator.userAgent.split(' ')[0];
             
             if (!storageAvailable) {
                 console.warn('localStorage not available - events will not persist');
+                showMessage('Advertencia: Los datos no se guardarán en este navegador', 'warning');
             }
             
-            // Verificar si hay datos en la URL (para sincronización)
+            // Check for sync data in URL
             checkForSyncData();
             
-            // Cargar eventos
-            events = safeGetFromStorage('banquetera_events');
-            console.log('Eventos cargados:', events.length);
+            // Load events
+            try {
+                events = safeGetFromStorage('banquetera_events');
+                console.log('Eventos cargados:', events.length);
+            } catch (e) {
+                console.error('Error loading events:', e);
+                events = [];
+            }
             
             updateWeekInfo();
             displayEvents();
             updateAdminInfo();
             setupFileUpload();
             setDefaultDate();
-            setupMobileOptimizations();
+            setupEventListeners();
             
-            // Mostrar información de debug en consola
-            console.log('Navegador:', navigator.userAgent);
-            console.log('Viewport:', window.innerWidth + 'x' + window.innerHeight);
-            console.log('localStorage disponible:', storageAvailable);
-            
-            // Recargar eventos cada 30 segundos para sincronización
-            setInterval(() => {
-                const newEvents = safeGetFromStorage('banquetera_events');
-                if (newEvents.length !== events.length) {
-                    console.log('Detectados cambios en eventos, recargando...');
-                    events = newEvents;
-                    displayEvents();
-                }
-            }, 30000);
+            // Periodic sync check
+            if (storageAvailable) {
+                setInterval(checkForUpdates, 30000);
+            }
         });
 
-        // Función para verificar datos de sincronización en la URL
+        // Enhanced sync data checking
         function checkForSyncData() {
             const urlParams = new URLSearchParams(window.location.search);
             const syncData = urlParams.get('sync');
@@ -1070,214 +1162,171 @@
                     const decodedData = atob(syncData);
                     const importedEvents = JSON.parse(decodedData);
                     
-                    if (importedEvents && importedEvents.length > 0) {
-                        // Mostrar mensaje de confirmación
-                        if (confirm(`Se han detectado ${importedEvents.length} eventos para sincronizar.\n\n¿Deseas cargar estos eventos en este dispositivo?`)) {
+                    if (importedEvents && Array.isArray(importedEvents) && importedEvents.length > 0) {
+                        const confirmMessage = `Se detectaron ${importedEvents.length} eventos para sincronizar.\n\n¿Deseas cargar estos eventos?`;
+                        
+                        if (confirm(confirmMessage)) {
                             events = importedEvents;
-                            safeSetToStorage('banquetera_events', events);
+                            if (safeSetToStorage('banquetera_events', events)) {
+                                showMessage(`${importedEvents.length} eventos sincronizados correctamente!`);
+                            }
                             
-                            // Limpiar la URL para evitar recargas accidentales
+                            // Clean URL
                             window.history.replaceState({}, document.title, window.location.pathname);
                             
-                            // Mostrar mensaje de éxito
                             setTimeout(() => {
-                                alert('Eventos sincronizados correctamente!\n\nYa puedes ver todos los eventos en este dispositivo.');
-                                location.reload();
-                            }, 500);
+                                displayEvents();
+                                updateAdminInfo();
+                            }, 100);
                         } else {
-                            // Limpiar la URL si el usuario cancela
                             window.history.replaceState({}, document.title, window.location.pathname);
                         }
                     }
                 } catch (error) {
-                    console.error('Error al procesar datos de sincronización:', error);
-                    alert('Error al sincronizar datos. El link puede estar corrupto.');
+                    console.error('Error processing sync data:', error);
+                    alert('Error al sincronizar datos. El enlace puede estar corrupto.');
+                    window.history.replaceState({}, document.title, window.location.pathname);
                 }
             }
         }
 
-        // Función para crear eventos de prueba
-        function createDemoEvents() {
-            if (events.length > 0) {
-                if (!confirm('Ya hay eventos creados. ¿Quieres añadir eventos de prueba de todas formas?')) {
-                    return;
+        function checkForUpdates() {
+            try {
+                const newEvents = safeGetFromStorage('banquetera_events');
+                if (newEvents.length !== events.length) {
+                    console.log('Detected changes, reloading...');
+                    events = newEvents;
+                    displayEvents();
+                    updateAdminInfo();
                 }
+            } catch (e) {
+                console.error('Error checking for updates:', e);
             }
-
-            const today = new Date();
-            const tomorrow = new Date(today);
-            tomorrow.setDate(today.getDate() + 1);
-            const nextWeek = new Date(today);
-            nextWeek.setDate(today.getDate() + 7);
-
-            const demoEvents = [
-                {
-                    id: Date.now(),
-                    center: 'Salón Principal',
-                    date: today.toISOString().split('T')[0],
-                    time: '19:00',
-                    guestCount: '150',
-                    observations: 'Evento de prueba - vegetarianos: 10 personas',
-                    documents: [
-                        {
-                            name: 'Menu-Principal.pdf',
-                            size: 1024000,
-                            url: 'data:application/pdf;base64,JVBERi0xLjMKJcTl8uXrp/Og0MTGCjQgMCBvYmoKPDwKL0xlbmd0aCA5NDEKL0ZpbHRlciAvRmxhdGVEZWNvZGUKPj4Kc3RyZWFtCngBhVVdb9sgFH3vr+DIL5YxGAz4rd+6Tuu0aR3btElbpQQb6tI2xXbI/',
-                            roles: ['supervisor', 'supermetre', 'cocina']
-                        },
-                        {
-                            name: 'Lista-Invitados.pdf',
-                            size: 512000,
-                            url: 'data:application/pdf;base64,JVBERi0xLjMKJcTl8uXrp/Og0MTGCjQgMCBvYmoKPDwKL0xlbmd0aCA5NDEKL0ZpbHRlciAvRmxhdGVEZWNvZGUKPj4Kc3RyZWFtCngBhVVdb9sgFH3vr+DIL5YxGAz4rd+6Tuu0aR3btElbpQQb6tI2xXbI/',
-                            roles: ['supervisor', 'supermetre']
-                        },
-                        {
-                            name: 'Recetas-Especiales.pdf',
-                            size: 2048000,
-                            url: 'data:application/pdf;base64,JVBERi0xLjMKJcTl8uXrp/Og0MTGCjQgMCBvYmoKPDwKL0xlbmd0aCA5NDEKL0ZpbHRlciAvRmxhdGVEZWNvZGUKPj4Kc3RyZWFtCngBhVVdb9sgFH3vr+DIL5YxGAz4rd+6Tuu0aR3btElbpQQb6tI2xXbI/',
-                            roles: ['cocina']
-                        }
-                    ],
-                    created: new Date().toISOString()
-                },
-                {
-                    id: Date.now() + 1,
-                    center: 'Terraza Garden',
-                    date: tomorrow.toISOString().split('T')[0],
-                    time: '18:30',
-                    guestCount: '80',
-                    observations: 'Evento al aire libre - tener en cuenta el clima',
-                    documents: [
-                        {
-                            name: 'Montaje-Terraza.pdf',
-                            size: 1536000,
-                            url: 'data:application/pdf;base64,JVBERi0xLjMKJcTl8uXrp/Og0MTGCjQgMCBvYmoKPDwKL0xlbmd0aCA5NDEKL0ZpbHRlciAvRmxhdGVEZWNvZGUKPj4Kc3RyZWFtCngBhVVdb9sgFH3vr+DIL5YxGAz4rd+6Tuu0aR3btElbpQQb6tI2xXbI/',
-                            roles: ['supervisor', 'supermetre']
-                        },
-                        {
-                            name: 'Menu-Cocktail.pdf',
-                            size: 768000,
-                            url: 'data:application/pdf;base64,JVBERi0xLjMKJcTl8uXrp/Og0MTGCjQgMCBvYmoKPDwKL0xlbmd0aCA5NDEKL0ZpbHRlciAvRmxhdGVEZWNvZGUKPj4Kc3RyZWFtCngBhVVdb9sgFH3vr+DIL5YxGAz4rd+6Tuu0aR3btElbpQQb6tI2xXbI/',
-                            roles: ['cocina', 'supermetre']
-                        }
-                    ],
-                    created: new Date().toISOString()
-                },
-                {
-                    id: Date.now() + 2,
-                    center: 'Salón VIP',
-                    date: nextWeek.toISOString().split('T')[0],
-                    time: '20:00',
-                    guestCount: '200',
-                    observations: 'Evento corporativo - dress code formal',
-                    documents: [
-                        {
-                            name: 'Protocolo-Corporativo.pdf',
-                            size: 1200000,
-                            url: 'data:application/pdf;base64,JVBERi0xLjMKJcTl8uXrp/Og0MTGCjQgMCBvYmoKPDwKL0xlbmd0aCA5NDEKL0ZpbHRlciAvRmxhdGVEZWNvZGUKPj4Kc3RyZWFtCngBhVVdb9sgFH3vr+DIL5YxGAz4rd+6Tuu0aR3btElbpQQb6tI2xXbI/',
-                            roles: ['supervisor']
-                        },
-                        {
-                            name: 'Menu-Gourmet.pdf',
-                            size: 1800000,
-                            url: 'data:application/pdf;base64,JVBERi0xLjMKJcTl8uXrp/Og0MTGCjQgMCBvYmoKPDwKL0xlbmd0aCA5NDEKL0ZpbHRlciAvRmxhdGVEZWNvZGUKPj4Kc3RyZWFtCngBhVVdb9sgFH3vr+DIL5YxGAz4rd+6Tuu0aR3btElbpQQb6tI2xXbI/',
-                            roles: ['cocina', 'supervisor']
-                        },
-                        {
-                            name: 'Lista-VIP.pdf',
-                            size: 900000,
-                            url: 'data:application/pdf;base64,JVBERi0xLjMKJcTl8uXrp/Og0MTGCjQgMCBvYmoKPDwKL0xlbmd0aCA5NDEKL0ZpbHRlciAvRmxhdGVEZWNvZGUKPj4Kc3RyZWFtCngBhVVdb9sgFH3vr+DIL5YxGAz4rd+6Tuu0aR3btElbpQQb6tI2xXbI/',
-                            roles: ['supervisor', 'supermetre']
-                        }
-                    ],
-                    created: new Date().toISOString()
-                }
-            ];
-
-            // Agregar eventos de prueba a los existentes
-            events = events.concat(demoEvents);
-            safeSetToStorage('banquetera_events', events);
-
-            displayEvents();
-            updateAdminInfo();
-            updateAdminEventsList();
-            showMessage(`Se crearon ${demoEvents.length} eventos de prueba correctamente!`);
         }
 
-        // Función para generar link de sincronización
-        function generateShareLink() {
-            if (events.length === 0) {
-                alert('No hay eventos para sincronizar. Crea algunos eventos primero.');
+        // Enhanced event listeners
+        function setupEventListeners() {
+            // Modal close on background click
+            document.getElementById('documentsModal')?.addEventListener('click', function(e) {
+                if (e.target === this) closeModal();
+            });
+
+            // Password modal enter key
+            document.getElementById('passwordInput')?.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    checkPassword();
+                }
+            });
+
+            // Escape key handling
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closePasswordModal();
+                    closeModal();
+                }
+            });
+
+            // Form submission
+            document.getElementById('eventForm')?.addEventListener('submit', handleFormSubmit);
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            // Validate form
+            const center = document.getElementById('eventCenter').value.trim();
+            const date = document.getElementById('eventDate').value;
+            const time = document.getElementById('eventTime').value;
+            const guestCount = document.getElementById('guestCount').value;
+            
+            if (!center || !date || !time || !guestCount) {
+                showMessage('Por favor completa todos los campos obligatorios', 'warning');
                 return;
             }
             
-            try {
-                const dataString = JSON.stringify(events);
-                const encodedData = btoa(dataString);
-                const currentUrl = window.location.origin + window.location.pathname;
-                const shareUrl = `${currentUrl}?sync=${encodedData}`;
-                
-                document.getElementById('shareLinkInput').value = shareUrl;
-                document.getElementById('shareLink').style.display = 'block';
-                
-                showMessage(`Link de sincronización generado con ${events.length} eventos`);
-            } catch (error) {
-                console.error('Error generando link:', error);
-                alert('Error generando link. Los datos pueden ser muy grandes.');
-            }
-        }
-
-        function copyShareLink() {
-            const linkInput = document.getElementById('shareLinkInput');
-            linkInput.select();
-            linkInput.setSelectionRange(0, 99999); // Para móviles
+            // Check document role assignments
+            const unassignedFiles = currentFiles.filter(fileData => 
+                !fileData.roles || fileData.roles.length === 0
+            );
             
+            if (unassignedFiles.length > 0) {
+                const fileNames = unassignedFiles.map(f => f.name).join('\n');
+                alert(`Los siguientes documentos no tienen roles asignados:\n\n${fileNames}\n\nAsigna al menos un rol a cada documento o elimínalo.`);
+                return;
+            }
+            
+            const eventData = {
+                center: center,
+                date: date,
+                time: time,
+                guestCount: guestCount,
+                observations: document.getElementById('observations').value.trim(),
+                documents: currentFiles.map(fileData => ({
+                    name: fileData.name,
+                    size: fileData.size,
+                    url: fileData.url,
+                    roles: fileData.roles || []
+                }))
+            };
+
             try {
-                document.execCommand('copy');
-                showMessage('Link copiado al portapapeles');
-                
-                // También mostrar el link para copiarlo manualmente si falla
-                if (navigator.share && /Android|iPhone|iPad/i.test(navigator.userAgent)) {
-                    navigator.share({
-                        title: 'Eventos Banquetera',
-                        text: 'Link para sincronizar eventos',
-                        url: linkInput.value
-                    });
+                if (editingEventId) {
+                    // Update existing event
+                    const eventIndex = events.findIndex(e => e.id === editingEventId);
+                    if (eventIndex !== -1) {
+                        events[eventIndex] = {
+                            ...events[eventIndex],
+                            ...eventData,
+                            updated: new Date().toISOString()
+                        };
+                        showMessage('Evento actualizado correctamente!');
+                        cancelEdit();
+                    }
+                } else {
+                    // Create new event
+                    const newEvent = {
+                        id: Date.now(),
+                        ...eventData,
+                        created: new Date().toISOString()
+                    };
+                    events.push(newEvent);
+                    showMessage('Evento creado correctamente!');
+                    
+                    // Reset form
+                    document.getElementById('eventForm').reset();
+                    currentFiles = [];
+                    displayDocumentAssignment();
+                    setDefaultDate();
                 }
-            } catch (err) {
-                console.log('Error copiando:', err);
-                // Fallback: seleccionar texto para copia manual
-                linkInput.focus();
-                linkInput.select();
-                alert('Selecciona y copia manualmente el link que aparece seleccionado');
+
+                // Save to storage
+                if (safeSetToStorage('banquetera_events', events)) {
+                    displayEvents();
+                    updateAdminInfo();
+                    updateAdminEventsList();
+                } else {
+                    showMessage('Error al guardar. Intenta de nuevo.', 'warning');
+                }
+            } catch (error) {
+                console.error('Error saving event:', error);
+                showMessage('Error al procesar el evento', 'warning');
             }
         }
 
-        function hideShareLink() {
-            document.getElementById('shareLink').style.display = 'none';
-        }
-
-        function setupMobileOptimizations() {
-            // Prevenir zoom en inputs en iOS
-            if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-                const viewport = document.querySelector('meta[name=viewport]');
-                if (viewport) {
-                    viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
-                }
-            }
-
-            // Mejorar experiencia táctil
-            document.addEventListener('touchstart', function() {}, true);
-        }
-
-        // Funciones para autenticación
+        // Authentication functions
         function requestAdminAccess() {
             document.getElementById('passwordModal').classList.add('active');
-            document.getElementById('passwordInput').focus();
+            document.body.classList.add('modal-open');
+            
+            setTimeout(() => {
+                document.getElementById('passwordInput').focus();
+            }, 100);
         }
 
         function closePasswordModal() {
             document.getElementById('passwordModal').classList.remove('active');
+            document.body.classList.remove('modal-open');
             document.getElementById('passwordInput').value = '';
             document.getElementById('passwordError').style.display = 'none';
         }
@@ -1295,31 +1344,45 @@
                 document.getElementById('passwordInput').value = '';
                 document.getElementById('passwordInput').focus();
                 
-                // Vibrar en móviles si está disponible
-                if (navigator.vibrate) {
+                // Mobile vibration feedback
+                if (navigator.vibrate && isMobile) {
                     navigator.vibrate(200);
                 }
             }
         }
 
-        // Permitir envío con Enter en el campo de contraseña
-        document.addEventListener('DOMContentLoaded', function() {
-            const passwordInput = document.getElementById('passwordInput');
-            if (passwordInput) {
-                passwordInput.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        checkPassword();
-                    }
-                });
+        function toggleAdminPanel() {
+            if (!isAuthenticated) {
+                requestAdminAccess();
+                return;
             }
-        });
 
-        // Cerrar modal de contraseña con Escape
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closePasswordModal();
+            adminPanelVisible = !adminPanelVisible;
+            const panel = document.getElementById('adminPanel');
+            const toggleBtn = document.querySelector('.admin-toggle');
+            
+            if (adminPanelVisible) {
+                panel.classList.add('active');
+                toggleBtn.textContent = '❌ Cerrar Admin';
+                toggleBtn.style.background = 'rgba(220, 53, 69, 0.9)';
+                toggleBtn.style.color = 'white';
+                updateAdminEventsList();
+                
+                // Auto-logout after 10 minutes
+                setTimeout(() => {
+                    if (adminPanelVisible) {
+                        toggleAdminPanel();
+                        isAuthenticated = false;
+                        showMessage('Sesión administrativa expirada por seguridad', 'warning');
+                    }
+                }, 600000);
+            } else {
+                panel.classList.remove('active');
+                toggleBtn.textContent = '🔧 Admin';
+                toggleBtn.style.background = 'rgba(255, 255, 255, 0.9)';
+                toggleBtn.style.color = '#333';
             }
-        });
+        }
 
         function setDefaultDate() {
             const today = new Date();
@@ -1341,11 +1404,15 @@
             const container = document.getElementById('eventsContainer');
             if (!container) return;
             
-            // Forzar recarga de eventos desde localStorage
-            events = safeGetFromStorage('banquetera_events');
+            // Force reload from localStorage
+            try {
+                events = safeGetFromStorage('banquetera_events');
+            } catch (e) {
+                console.error('Error loading events for display:', e);
+                events = [];
+            }
             
-            console.log('Mostrando eventos:', events.length);
-            
+            console.log('Displaying events:', events.length);
             container.innerHTML = '';
 
             if (events.length === 0) {
@@ -1355,14 +1422,15 @@
                         <h3>No hay eventos programados</h3>
                         <p>Los eventos aparecerán aquí cuando sean cargados desde el panel administrativo</p>
                         <p style="margin-top: 15px; font-size: 0.9em; color: #999;">
-                            💡 <strong>Tip:</strong> Abre el panel administrativo para crear eventos de prueba
+                            💡 <strong>Tip:</strong> Usa el botón Admin para crear eventos de prueba
                         </p>
                         <div class="debug-info">
-                            <p><strong>Información de Debug:</strong></p>
-                            <p>Navegador: ${navigator.userAgent.substring(0, 50)}...</p>
-                            <p>Fecha actual: ${new Date().toLocaleDateString('es-ES')}</p>
-                            <p>Eventos en memoria: ${events.length}</p>
-                            <p>LocalStorage: ${isLocalStorageAvailable() ? 'Disponible' : 'No disponible'}</p>
+                            <p><strong>Debug Info:</strong></p>
+                            <p>Mobile: ${isMobile ? 'Sí' : 'No'}</p>
+                            <p>iOS: ${isIOS ? 'Sí' : 'No'}</p>
+                            <p>Fecha: ${new Date().toLocaleDateString('es-ES')}</p>
+                            <p>Eventos: ${events.length}</p>
+                            <p>Storage: ${isLocalStorageAvailable() ? 'OK' : 'Error'}</p>
                             <p>Viewport: ${window.innerWidth}x${window.innerHeight}</p>
                         </div>
                     </div>
@@ -1377,10 +1445,10 @@
                 dateTitle.style.cssText = `
                     grid-column: 1 / -1;
                     text-align: center;
-                    font-size: 1.8em;
+                    font-size: 1.6em;
                     font-weight: bold;
                     color: #ff6b6b;
-                    margin: 30px 0 20px 0;
+                    margin: 25px 0 15px 0;
                     padding: 15px;
                     background: white;
                     border-radius: 15px;
@@ -1405,16 +1473,13 @@
                         month: 'long'
                     });
                 } catch (e) {
-                    // Fallback si hay problemas con toLocaleDateString
                     dayLabel = eventDate.toDateString();
                 }
                 
                 if (isToday) dayLabel = `HOY - ${dayLabel}`;
                 else if (isTomorrow) dayLabel = `MAÑANA - ${dayLabel}`;
-                else dayLabel = dayLabel;
                 
                 dateTitle.textContent = `${dayLabel} (${eventsByDate[date].length} eventos)`;
-                
                 container.appendChild(dateTitle);
 
                 eventsByDate[date].forEach(event => {
@@ -1425,7 +1490,6 @@
         }
 
         function parseEventDate(dateString) {
-            // Crear fecha de manera segura evitando problemas de timezone
             const parts = dateString.split('-');
             return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
         }
@@ -1443,6 +1507,8 @@
             const card = document.createElement('div');
             card.className = 'event-card';
             
+            const docCount = (event.documents && event.documents.length) || 0;
+            
             card.innerHTML = `
                 <div class="event-header">
                     <div class="event-title">${event.center}</div>
@@ -1451,7 +1517,7 @@
                 <div class="event-info">
                     <p><strong>⏰ Hora:</strong> ${event.time}</p>
                     <p><strong>👥 Invitados:</strong> ${event.guestCount}</p>
-                    <p><strong>📄 Documentos:</strong> ${event.documents ? event.documents.length : 0}</p>
+                    <p><strong>📄 Documentos:</strong> ${docCount}</p>
                     ${event.observations ? `<p><strong>📝 Notas:</strong> ${event.observations}</p>` : ''}
                 </div>
                 <div class="roles-container">
@@ -1483,7 +1549,6 @@
                 cocina: { name: 'Cocina', emoji: '👨‍🍳', color: '#dc3545' }
             };
 
-            // Filtrar documentos asignados a este rol
             const filteredDocs = (event.documents || []).filter(doc => 
                 doc.roles && doc.roles.includes(role)
             );
@@ -1525,59 +1590,33 @@
             }
 
             document.getElementById('documentsModal').classList.add('active');
+            document.body.classList.add('modal-open');
         }
 
         function openDocument(url, name) {
-            // En móviles, abrir en nueva ventana funciona mejor
-            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-                window.open(url, '_blank');
-            } else {
-                // En desktop, crear un enlace de descarga si es necesario
-                const link = document.createElement('a');
-                link.href = url;
-                link.target = '_blank';
-                link.download = name;
-                link.click();
+            try {
+                if (isMobile) {
+                    // Better mobile handling
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.target = '_blank';
+                    link.rel = 'noopener noreferrer';
+                    link.click();
+                } else {
+                    window.open(url, '_blank', 'noopener,noreferrer');
+                }
+            } catch (error) {
+                console.error('Error opening document:', error);
+                showMessage('Error al abrir el documento', 'warning');
             }
         }
 
         function closeModal() {
             document.getElementById('documentsModal').classList.remove('active');
+            document.body.classList.remove('modal-open');
         }
 
-        document.getElementById('documentsModal').onclick = function(e) {
-            if (e.target === this) closeModal();
-        }
-
-        // PANEL DE ADMINISTRACIÓN
-        function toggleAdminPanel() {
-            if (!isAuthenticated) {
-                requestAdminAccess();
-                return;
-            }
-
-            adminPanelVisible = !adminPanelVisible;
-            const panel = document.getElementById('adminPanel');
-            const toggleBtn = document.querySelector('.admin-toggle');
-            
-            if (adminPanelVisible) {
-                panel.classList.add('active');
-                toggleBtn.textContent = '❌ Cerrar Admin';
-                toggleBtn.style.background = 'rgba(220, 53, 69, 0.9)';
-                toggleBtn.style.color = 'white';
-                updateAdminEventsList();
-            } else {
-                panel.classList.remove('active');
-                toggleBtn.textContent = '🔧 Admin';
-                toggleBtn.style.background = 'rgba(255, 255, 255, 0.9)';
-                toggleBtn.style.color = '#333';
-                // Logout después de cerrar panel
-                setTimeout(() => {
-                    isAuthenticated = false;
-                }, 300000); // 5 minutos
-            }
-        }
-
+        // File upload handling
         function setupFileUpload() {
             const fileInput = document.getElementById('fileInput');
             const fileUploadArea = document.querySelector('.file-upload-area');
@@ -1586,7 +1625,7 @@
                 fileInput.addEventListener('change', handleFiles);
             }
             
-            if (fileUploadArea) {
+            if (fileUploadArea && !isMobile) {
                 fileUploadArea.addEventListener('dragover', (e) => {
                     e.preventDefault();
                     fileUploadArea.style.borderColor = '#ff6b6b';
@@ -1597,7 +1636,9 @@
                 fileUploadArea.addEventListener('drop', (e) => {
                     e.preventDefault();
                     fileUploadArea.style.borderColor = '#dee2e6';
-                    const files = Array.from(e.dataTransfer.files).filter(file => file.type === 'application/pdf');
+                    const files = Array.from(e.dataTransfer.files).filter(file => 
+                        file.type === 'application/pdf'
+                    );
                     processFiles(files);
                 });
             }
@@ -1609,38 +1650,37 @@
         }
 
         function processFiles(files) {
-            // Si estamos editando, mantener documentos existentes
-            if (editingEventId) {
-                const existingEvent = events.find(e => e.id === editingEventId);
-                if (existingEvent && existingEvent.documents) {
-                    // Añadir nuevos archivos a los existentes
-                    const newFiles = files.map(file => ({
-                        file: file,
-                        name: file.name,
-                        size: file.size,
-                        url: URL.createObjectURL(file),
-                        roles: []
-                    }));
-                    currentFiles = [...currentFiles, ...newFiles];
-                } else {
-                    currentFiles = files.map(file => ({
-                        file: file,
-                        name: file.name,
-                        size: file.size,
-                        url: URL.createObjectURL(file),
-                        roles: []
-                    }));
-                }
-            } else {
-                currentFiles = files.map(file => ({
+            if (files.length === 0) return;
+            
+            // Validate file types
+            const validFiles = files.filter(file => file.type === 'application/pdf');
+            if (validFiles.length !== files.length) {
+                showMessage('Solo se aceptan archivos PDF', 'warning');
+            }
+            
+            if (validFiles.length === 0) return;
+
+            try {
+                const newFiles = validFiles.map(file => ({
                     file: file,
                     name: file.name,
                     size: file.size,
                     url: URL.createObjectURL(file),
                     roles: []
                 }));
+
+                if (editingEventId) {
+                    currentFiles = [...currentFiles, ...newFiles];
+                } else {
+                    currentFiles = newFiles;
+                }
+
+                displayDocumentAssignment();
+                showMessage(`${validFiles.length} archivo(s) cargado(s) correctamente`);
+            } catch (error) {
+                console.error('Error processing files:', error);
+                showMessage('Error al procesar los archivos', 'warning');
             }
-            displayDocumentAssignment();
         }
 
         function displayDocumentAssignment() {
@@ -1650,7 +1690,7 @@
             container.innerHTML = '';
 
             if (currentFiles.length === 0) {
-                container.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">No hay documentos subidos aún</p>';
+                container.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">No hay documentos cargados</p>';
                 return;
             }
 
@@ -1660,10 +1700,10 @@
                 assignmentDiv.innerHTML = `
                     <div class="assignment-header">
                         <div class="document-name">📄 ${fileData.name}</div>
-                        <button class="remove-file-btn" onclick="removeFileFromList(${index})">❌ Eliminar</button>
+                        <button class="remove-file-btn" onclick="removeFileFromList(${index})">❌</button>
                     </div>
                     <div style="margin-bottom: 15px; color: #666; font-size: 0.9em;">
-                        Selecciona a qué roles debe estar disponible este documento:
+                        Selecciona los roles que pueden ver este documento:
                     </div>
                     <div class="role-checkboxes">
                         <label class="role-checkbox supervisor">
@@ -1685,37 +1725,48 @@
         }
 
         function toggleRole(fileIndex, role) {
-            const fileData = currentFiles[fileIndex];
-            if (fileData.roles.includes(role)) {
-                fileData.roles = fileData.roles.filter(r => r !== role);
-            } else {
-                fileData.roles.push(role);
+            try {
+                const fileData = currentFiles[fileIndex];
+                if (fileData.roles.includes(role)) {
+                    fileData.roles = fileData.roles.filter(r => r !== role);
+                } else {
+                    fileData.roles.push(role);
+                }
+            } catch (error) {
+                console.error('Error toggling role:', error);
             }
         }
 
         function removeFileFromList(index) {
-            currentFiles.splice(index, 1);
-            displayDocumentAssignment();
+            try {
+                if (currentFiles[index] && currentFiles[index].url) {
+                    URL.revokeObjectURL(currentFiles[index].url);
+                }
+                currentFiles.splice(index, 1);
+                displayDocumentAssignment();
+                showMessage('Archivo eliminado');
+            } catch (error) {
+                console.error('Error removing file:', error);
+            }
         }
 
-        // Funciones para editar eventos
+        // Admin functions
         function editEvent(eventId) {
             const event = events.find(e => e.id === eventId);
             if (!event) return;
 
             editingEventId = eventId;
             
-            // Mostrar indicador de modo edición
             document.getElementById('editEventContainer').style.display = 'block';
             
-            // Llenar formulario con datos existentes
+            // Fill form
             document.getElementById('eventCenter').value = event.center;
             document.getElementById('eventDate').value = event.date;
             document.getElementById('eventTime').value = event.time;
             document.getElementById('guestCount').value = event.guestCount;
             document.getElementById('observations').value = event.observations || '';
             
-            // Cargar documentos existentes
+            // Load existing documents
             if (event.documents) {
                 currentFiles = event.documents.map(doc => ({
                     name: doc.name,
@@ -1730,10 +1781,7 @@
                 displayDocumentAssignment();
             }
 
-            // Cambiar texto del botón
             document.getElementById('submitBtn').textContent = '💾 Actualizar Evento';
-            
-            // Hacer scroll al formulario
             document.getElementById('eventForm').scrollIntoView({ behavior: 'smooth' });
         }
 
@@ -1742,219 +1790,144 @@
             document.getElementById('editEventContainer').style.display = 'none';
             document.getElementById('submitBtn').textContent = '➕ Agregar Evento';
             
-            // Limpiar formulario
-            const form = document.getElementById('eventForm');
-            if (form) form.reset();
+            // Clear form
+            document.getElementById('eventForm').reset();
             currentFiles = [];
             displayDocumentAssignment();
             setDefaultDate();
-        }
-
-        // Manejar envío del formulario
-        document.addEventListener('DOMContentLoaded', function() {
-            const eventForm = document.getElementById('eventForm');
-            if (eventForm) {
-                eventForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    
-                    // Verificar que todos los documentos tengan al menos un rol asignado
-                    const unassignedFiles = currentFiles.filter(fileData => fileData.roles.length === 0);
-                    
-                    if (unassignedFiles.length > 0) {
-                        alert(`Los siguientes documentos no tienen roles asignados:\n\n${unassignedFiles.map(f => f.name).join('\n')}\n\nPor favor asigna al menos un rol a cada documento o elimínalo.`);
-                        return;
-                    }
-                    
-                    const eventData = {
-                        center: document.getElementById('eventCenter').value,
-                        date: document.getElementById('eventDate').value,
-                        time: document.getElementById('eventTime').value,
-                        guestCount: document.getElementById('guestCount').value,
-                        observations: document.getElementById('observations').value,
-                        documents: currentFiles.map(fileData => ({
-                            name: fileData.name,
-                            size: fileData.size,
-                            url: fileData.url,
-                            roles: fileData.roles
-                        }))
-                    };
-
-                    if (editingEventId) {
-                        // Actualizar evento existente
-                        const eventIndex = events.findIndex(e => e.id === editingEventId);
-                        events[eventIndex] = {
-                            ...events[eventIndex],
-                            ...eventData,
-                            updated: new Date().toISOString()
-                        };
-                        showMessage('Evento actualizado correctamente!');
-                        cancelEdit();
-                    } else {
-                        // Crear nuevo evento
-                        const newEvent = {
-                            id: Date.now(),
-                            ...eventData,
-                            created: new Date().toISOString()
-                        };
-                        events.push(newEvent);
-                        showMessage('Evento creado correctamente!');
-                        
-                        // Limpiar formulario
-                        this.reset();
-                        currentFiles = [];
-                        displayDocumentAssignment();
-                        setDefaultDate();
-                    }
-
-                    safeSetToStorage('banquetera_events', events);
-                    
-                    // Actualizar vistas
-                    displayEvents();
-                    updateAdminInfo();
-                    updateAdminEventsList();
-                });
-            }
-        });
-
-        function showMessage(message, type = 'success') {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = type === 'success' ? 'success-message' : 'warning-message';
-            messageDiv.textContent = message;
-            
-            const form = document.getElementById('eventForm');
-            if (form) {
-                form.insertBefore(messageDiv, form.firstChild);
-                
-                setTimeout(() => {
-                    messageDiv.remove();
-                }, 4000);
-            }
-        }
-
-        function updateAdminInfo() {
-            // Forzar recarga desde localStorage
-            events = safeGetFromStorage('banquetera_events');
-            
-            const eventCount = document.getElementById('eventCount');
-            const docCount = document.getElementById('docCount');
-            
-            if (eventCount) eventCount.textContent = events.length;
-            if (docCount) {
-                docCount.textContent = events.reduce((total, e) => total + (e.documents ? e.documents.length : 0), 0);
-            }
-        }
-
-        function updateAdminEventsList() {
-            // Forzar recarga desde localStorage
-            events = safeGetFromStorage('banquetera_events');
-            
-            const container = document.getElementById('adminEventsList');
-            if (!container) return;
-            
-            container.innerHTML = '';
-
-            if (events.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: #666;">No hay eventos creados aún</p>';
-                return;
-            }
-
-            // Ordenar eventos por fecha
-            const sortedEvents = [...events].sort((a, b) => new Date(b.date) - new Date(a.date));
-
-            sortedEvents.forEach(event => {
-                const eventDiv = document.createElement('div');
-                eventDiv.className = 'admin-event-card';
-                
-                // Contar documentos por rol
-                const docsByRole = {
-                    supervisor: 0,
-                    supermetre: 0,
-                    cocina: 0
-                };
-
-                if (event.documents) {
-                    event.documents.forEach(doc => {
-                        if (doc.roles) {
-                            doc.roles.forEach(role => {
-                                docsByRole[role]++;
-                            });
-                        }
-                    });
-                }
-
-                const eventDate = parseEventDate(event.date);
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                
-                const isToday = eventDate.toDateString() === today.toDateString();
-                const isPast = eventDate < today;
-                
-                let dateClass = '';
-                let datePrefix = '';
-                if (isToday) {
-                    dateClass = 'color: #ff6b6b; font-weight: bold;';
-                    datePrefix = 'HOY - ';
-                } else if (isPast) {
-                    dateClass = 'color: #999;';
-                    datePrefix = 'PASADO - ';
-                }
-
-                let formattedDate;
-                try {
-                    formattedDate = formatDate(event.date);
-                } catch (e) {
-                    formattedDate = event.date;
-                }
-
-                eventDiv.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                        <div>
-                            <h4 style="color: #ff6b6b; margin-bottom: 5px;">${event.center}</h4>
-                            <p style="${dateClass}">📅 ${datePrefix}${formattedDate} - ⏰ ${event.time}</p>
-                            <p>👥 ${event.guestCount} invitados</p>
-                            ${event.observations ? `<p style="font-style: italic; color: #666;">💬 ${event.observations}</p>` : ''}
-                        </div>
-                        <div style="display: flex; flex-direction: column; gap: 5px;">
-                            <button class="btn btn-warning" onclick="editEvent(${event.id})" style="padding: 8px 15px;">✏️ Editar</button>
-                            <button class="btn btn-danger" onclick="deleteEvent(${event.id})" style="padding: 8px 15px;">🗑️ Eliminar</button>
-                        </div>
-                    </div>
-                    <div style="background: #f8f9fa; padding: 15px; border-radius: 10px;">
-                        <h5 style="margin-bottom: 10px;">📄 Documentos por Rol:</h5>
-                        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                            <span style="background: #007bff; color: white; padding: 5px 15px; border-radius: 15px; font-size: 0.9em;">
-                                👔 Supervisor: ${docsByRole.supervisor}
-                            </span>
-                            <span style="background: #28a745; color: white; padding: 5px 15px; border-radius: 15px; font-size: 0.9em;">
-                                🎩 Supermetre: ${docsByRole.supermetre}
-                            </span>
-                            <span style="background: #dc3545; color: white; padding: 5px 15px; border-radius: 15px; font-size: 0.9em;">
-                                👨‍🍳 Cocina: ${docsByRole.cocina}
-                            </span>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(eventDiv);
-            });
         }
 
         function deleteEvent(id) {
             const event = events.find(e => e.id === id);
             if (!event) return;
             
-            if (confirm(`¿Eliminar el evento "${event.center}" del ${formatDate(event.date)}?\n\nSe eliminarán todos los documentos asociados.`)) {
+            const confirmMsg = `¿Eliminar el evento "${event.center}" del ${formatDate(event.date)}?\n\nSe eliminarán todos los documentos asociados.`;
+            
+            if (confirm(confirmMsg)) {
                 events = events.filter(e => e.id !== id);
-                safeSetToStorage('banquetera_events', events);
                 
-                // Si estábamos editando este evento, cancelar edición
                 if (editingEventId === id) {
                     cancelEdit();
                 }
                 
-                displayEvents();
-                updateAdminInfo();
-                updateAdminEventsList();
-                showMessage('Evento eliminado correctamente');
+                if (safeSetToStorage('banquetera_events', events)) {
+                    displayEvents();
+                    updateAdminInfo();
+                    updateAdminEventsList();
+                    showMessage('Evento eliminado correctamente');
+                } else {
+                    showMessage('Error al eliminar el evento', 'warning');
+                }
+            }
+        }
+
+        function updateAdminInfo() {
+            try {
+                events = safeGetFromStorage('banquetera_events');
+                
+                const eventCount = document.getElementById('eventCount');
+                const docCount = document.getElementById('docCount');
+                
+                if (eventCount) eventCount.textContent = events.length;
+                if (docCount) {
+                    const totalDocs = events.reduce((total, e) => total + ((e.documents && e.documents.length) || 0), 0);
+                    docCount.textContent = totalDocs;
+                }
+            } catch (error) {
+                console.error('Error updating admin info:', error);
+            }
+        }
+
+        function updateAdminEventsList() {
+            try {
+                events = safeGetFromStorage('banquetera_events');
+                
+                const container = document.getElementById('adminEventsList');
+                if (!container) return;
+                
+                container.innerHTML = '';
+
+                if (events.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">No hay eventos creados</p>';
+                    return;
+                }
+
+                const sortedEvents = [...events].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                sortedEvents.forEach(event => {
+                    const eventDiv = document.createElement('div');
+                    eventDiv.className = 'admin-event-card';
+                    
+                    const docsByRole = { supervisor: 0, supermetre: 0, cocina: 0 };
+
+                    if (event.documents) {
+                        event.documents.forEach(doc => {
+                            if (doc.roles) {
+                                doc.roles.forEach(role => {
+                                    if (docsByRole[role] !== undefined) {
+                                        docsByRole[role]++;
+                                    }
+                                });
+                            }
+                        });
+                    }
+
+                    const eventDate = parseEventDate(event.date);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    
+                    const isToday = eventDate.toDateString() === today.toDateString();
+                    const isPast = eventDate < today;
+                    
+                    let dateClass = '';
+                    let datePrefix = '';
+                    if (isToday) {
+                        dateClass = 'color: #ff6b6b; font-weight: bold;';
+                        datePrefix = 'HOY - ';
+                    } else if (isPast) {
+                        dateClass = 'color: #999;';
+                        datePrefix = 'PASADO - ';
+                    }
+
+                    let formattedDate;
+                    try {
+                        formattedDate = formatDate(event.date);
+                    } catch (e) {
+                        formattedDate = event.date;
+                    }
+
+                    eventDiv.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; gap: 15px;">
+                            <div style="flex: 1;">
+                                <h4 style="color: #ff6b6b; margin-bottom: 8px; font-size: 1.2em;">${event.center}</h4>
+                                <p style="${dateClass} margin-bottom: 5px;">📅 ${datePrefix}${formattedDate}</p>
+                                <p style="margin-bottom: 5px;">⏰ ${event.time} - 👥 ${event.guestCount} invitados</p>
+                                ${event.observations ? `<p style="font-style: italic; color: #666; margin-top: 8px;">💬 ${event.observations}</p>` : ''}
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 8px; flex-shrink: 0;">
+                                <button class="btn btn-warning" onclick="editEvent(${event.id})" style="padding: 6px 12px; font-size: 0.85em; width: 80px;">✏️ Editar</button>
+                                <button class="btn btn-danger" onclick="deleteEvent(${event.id})" style="padding: 6px 12px; font-size: 0.85em; width: 80px;">🗑️ Borrar</button>
+                            </div>
+                        </div>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 10px;">
+                            <h5 style="margin-bottom: 12px; color: #333;">📄 Documentos por Rol:</h5>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px;">
+                                <span style="background: #007bff; color: white; padding: 6px 12px; border-radius: 15px; font-size: 0.85em; text-align: center;">
+                                    👔 Supervisor: ${docsByRole.supervisor}
+                                </span>
+                                <span style="background: #28a745; color: white; padding: 6px 12px; border-radius: 15px; font-size: 0.85em; text-align: center;">
+                                    🎩 Supermetre: ${docsByRole.supermetre}
+                                </span>
+                                <span style="background: #dc3545; color: white; padding: 6px 12px; border-radius: 15px; font-size: 0.85em; text-align: center;">
+                                    👨‍🍳 Cocina: ${docsByRole.cocina}
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(eventDiv);
+                });
+            } catch (error) {
+                console.error('Error updating admin events list:', error);
             }
         }
 
@@ -1972,21 +1945,310 @@
                 return;
             }
 
-            if (confirm(`Se eliminarán ${oldEvents.length} eventos anteriores a hoy.\n\n¿Continuar?`)) {
+            const confirmMsg = `Se eliminarán ${oldEvents.length} eventos anteriores a hoy.\n\n¿Continuar?`;
+            
+            if (confirm(confirmMsg)) {
                 events = events.filter(event => {
                     const eventDate = parseEventDate(event.date);
                     return eventDate >= today;
                 });
 
-                safeSetToStorage('banquetera_events', events);
-                
-                displayEvents();
-                updateAdminInfo();
-                updateAdminEventsList();
-                showMessage(`Se eliminaron ${oldEvents.length} eventos antiguos`);
+                if (safeSetToStorage('banquetera_events', events)) {
+                    displayEvents();
+                    updateAdminInfo();
+                    updateAdminEventsList();
+                    showMessage(`Se eliminaron ${oldEvents.length} eventos antiguos`);
+                } else {
+                    showMessage('Error al limpiar eventos antiguos', 'warning');
+                }
             }
         }
 
+        // Demo events creation
+        function createDemoEvents() {
+            if (events.length > 0) {
+                if (!confirm('Ya hay eventos creados. ¿Añadir eventos de prueba de todas formas?')) {
+                    return;
+                }
+            }
+
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(today.getDate() + 1);
+            const nextWeek = new Date(today);
+            nextWeek.setDate(today.getDate() + 7);
+
+            const demoEvents = [
+                {
+                    id: Date.now(),
+                    center: 'Salón Principal',
+                    date: today.toISOString().split('T')[0],
+                    time: '19:00',
+                    guestCount: '150',
+                    observations: 'Evento de prueba - 10 vegetarianos',
+                    documents: [
+                        {
+                            name: 'Menu-Principal.pdf',
+                            size: 1024000,
+                            url: createDummyPDFUrl('Menu Principal'),
+                            roles: ['supervisor', 'supermetre', 'cocina']
+                        },
+                        {
+                            name: 'Lista-Invitados.pdf',
+                            size: 512000,
+                            url: createDummyPDFUrl('Lista de Invitados'),
+                            roles: ['supervisor', 'supermetre']
+                        },
+                        {
+                            name: 'Recetas-Especiales.pdf',
+                            size: 2048000,
+                            url: createDummyPDFUrl('Recetas Especiales'),
+                            roles: ['cocina']
+                        }
+                    ],
+                    created: new Date().toISOString()
+                },
+                {
+                    id: Date.now() + 1,
+                    center: 'Terraza Garden',
+                    date: tomorrow.toISOString().split('T')[0],
+                    time: '18:30',
+                    guestCount: '80',
+                    observations: 'Evento al aire libre - revisar clima',
+                    documents: [
+                        {
+                            name: 'Montaje-Terraza.pdf',
+                            size: 1536000,
+                            url: createDummyPDFUrl('Montaje Terraza'),
+                            roles: ['supervisor', 'supermetre']
+                        },
+                        {
+                            name: 'Menu-Cocktail.pdf',
+                            size: 768000,
+                            url: createDummyPDFUrl('Menu Cocktail'),
+                            roles: ['cocina', 'supermetre']
+                        }
+                    ],
+                    created: new Date().toISOString()
+                },
+                {
+                    id: Date.now() + 2,
+                    center: 'Salón VIP',
+                    date: nextWeek.toISOString().split('T')[0],
+                    time: '20:00',
+                    guestCount: '200',
+                    observations: 'Evento corporativo - dress code formal',
+                    documents: [
+                        {
+                            name: 'Protocolo-Corporativo.pdf',
+                            size: 1200000,
+                            url: createDummyPDFUrl('Protocolo Corporativo'),
+                            roles: ['supervisor']
+                        },
+                        {
+                            name: 'Menu-Gourmet.pdf',
+                            size: 1800000,
+                            url: createDummyPDFUrl('Menu Gourmet'),
+                            roles: ['cocina', 'supervisor']
+                        },
+                        {
+                            name: 'Lista-VIP.pdf',
+                            size: 900000,
+                            url: createDummyPDFUrl('Lista VIP'),
+                            roles: ['supervisor', 'supermetre']
+                        }
+                    ],
+                    created: new Date().toISOString()
+                }
+            ];
+
+            events = events.concat(demoEvents);
+            
+            if (safeSetToStorage('banquetera_events', events)) {
+                displayEvents();
+                updateAdminInfo();
+                updateAdminEventsList();
+                showMessage(`Se crearon ${demoEvents.length} eventos de prueba correctamente!`);
+            } else {
+                showMessage('Error al crear eventos de prueba', 'warning');
+            }
+        }
+
+        function createDummyPDFUrl(title) {
+            // Create a simple PDF with the title
+            const content = `%PDF-1.4
+1 0 obj
+<<
+/Type /Catalog
+/Pages 2 0 R
+>>
+endobj
+
+2 0 obj
+<<
+/Type /Pages
+/Kids [3 0 R]
+/Count 1
+>>
+endobj
+
+3 0 obj
+<<
+/Type /Page
+/Parent 2 0 R
+/MediaBox [0 0 612 792]
+/Contents 4 0 R
+>>
+endobj
+
+4 0 obj
+<<
+/Length 44
+>>
+stream
+BT
+/F1 12 Tf
+100 700 Td
+(${title}) Tj
+ET
+endstream
+endobj
+
+xref
+0 5
+0000000000 65535 f 
+0000000010 00000 n 
+0000000053 00000 n 
+0000000125 00000 n 
+0000000185 00000 n 
+trailer
+<<
+/Size 5
+/Root 1 0 R
+>>
+startxref
+279
+%%EOF`;
+            
+            const blob = new Blob([content], { type: 'application/pdf' });
+            return URL.createObjectURL(blob);
+        }
+
+        // Sync and export functions
+        function generateShareLink() {
+            if (events.length === 0) {
+                alert('No hay eventos para sincronizar. Crea algunos eventos primero.');
+                return;
+            }
+            
+            try {
+                const dataString = JSON.stringify(events);
+                const encodedData = btoa(dataString);
+                const currentUrl = window.location.origin + window.location.pathname;
+                const shareUrl = `${currentUrl}?sync=${encodedData}`;
+                
+                document.getElementById('shareLinkInput').value = shareUrl;
+                document.getElementById('shareLink').style.display = 'block';
+                
+                showMessage(`Link generado con ${events.length} eventos`);
+            } catch (error) {
+                console.error('Error generating link:', error);
+                alert('Error generando link. Los datos pueden ser muy grandes.');
+            }
+        }
+
+        function copyShareLink() {
+            const linkInput = document.getElementById('shareLinkInput');
+            
+            try {
+                linkInput.select();
+                linkInput.setSelectionRange(0, 99999);
+                
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(linkInput.value).then(() => {
+                        showMessage('Link copiado al portapapeles');
+                    });
+                } else {
+                    document.execCommand('copy');
+                    showMessage('Link copiado al portapapeles');
+                }
+                
+                // Mobile share if available
+                if (navigator.share && isMobile) {
+                    navigator.share({
+                        title: 'Eventos Banquetera',
+                        text: 'Link para sincronizar eventos',
+                        url: linkInput.value
+                    });
+                }
+            } catch (err) {
+                console.log('Error copying link:', err);
+                linkInput.focus();
+                linkInput.select();
+                alert('Selecciona y copia manualmente el link destacado');
+            }
+        }
+
+        function hideShareLink() {
+            document.getElementById('shareLink').style.display = 'none';
+        }
+
+        function exportData() {
+            try {
+                const dataStr = JSON.stringify(events, null, 2);
+                const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(dataBlob);
+                link.download = `eventos_banquetera_${new Date().toISOString().split('T')[0]}.json`;
+                link.click();
+                
+                showMessage('Datos exportados correctamente');
+            } catch (error) {
+                console.error('Error exporting data:', error);
+                showMessage('Error al exportar datos', 'warning');
+            }
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedEvents = JSON.parse(e.target.result);
+                    
+                    if (!Array.isArray(importedEvents)) {
+                        throw new Error('El archivo debe contener un array de eventos');
+                    }
+                    
+                    const confirmMsg = `¿Importar ${importedEvents.length} eventos?\n\nEsto sobrescribirá todos los eventos actuales.`;
+                    
+                    if (confirm(confirmMsg)) {
+                        events = importedEvents;
+                        
+                        if (safeSetToStorage('banquetera_events', events)) {
+                            displayEvents();
+                            updateAdminInfo();
+                            updateAdminEventsList();
+                            showMessage(`${importedEvents.length} eventos importados correctamente`);
+                        } else {
+                            showMessage('Error al guardar los eventos importados', 'warning');
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error importing data:', error);
+                    alert('Error al leer el archivo. Verifica que sea un archivo JSON válido de eventos.');
+                }
+            };
+            reader.readAsText(file);
+            
+            // Reset file input
+            event.target.value = '';
+        }
+
+        // Utility functions
         function formatDate(dateString) {
             try {
                 const date = parseEventDate(dateString);
@@ -1997,7 +2259,7 @@
                     weekday: 'long'
                 });
             } catch (e) {
-                console.log('Error formateando fecha:', dateString, e);
+                console.log('Error formatting date:', dateString, e);
                 return dateString;
             }
         }
@@ -2010,48 +2272,66 @@
                     day: 'numeric'
                 });
             } catch (e) {
-                console.log('Error formateando fecha corta:', dateString, e);
+                console.log('Error formatting short date:', dateString, e);
                 const parts = dateString.split('-');
                 return `${parts[2]}/${parts[1]}`;
             }
         }
 
-        // Funciones para respaldo de datos
-        function exportData() {
-            const dataStr = JSON.stringify(events, null, 2);
-            const dataBlob = new Blob([dataStr], {type: 'application/json'});
-            
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(dataBlob);
-            link.download = `eventos_banquetera_${new Date().toISOString().split('T')[0]}.json`;
-            link.click();
-            
-            showMessage('Datos exportados correctamente');
-        }
-
-        function importData(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const importedEvents = JSON.parse(e.target.result);
-                        if (confirm('¿Importar estos datos?\n\nEsto sobrescribirá todos los eventos actuales.')) {
-                            events = importedEvents;
-                            safeSetToStorage('banquetera_events', events);
-                            
-                            displayEvents();
-                            updateAdminInfo();
-                            updateAdminEventsList();
-                            showMessage('Datos importados correctamente');
+        function showMessage(message, type = 'success') {
+            try {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = type === 'success' ? 'success-message' : 'warning-message';
+                messageDiv.textContent = message;
+                
+                const form = document.getElementById('eventForm');
+                if (form && form.parentNode) {
+                    form.parentNode.insertBefore(messageDiv, form);
+                    
+                    setTimeout(() => {
+                        if (messageDiv.parentNode) {
+                            messageDiv.remove();
                         }
-                    } catch (error) {
-                        alert('Error al leer el archivo. Verifica que sea un archivo JSON válido.');
-                    }
-                };
-                reader.readAsText(file);
+                    }, 4000);
+                } else {
+                    // Fallback: show alert
+                    alert(message);
+                }
+            } catch (error) {
+                console.error('Error showing message:', error);
+                alert(message);
             }
         }
+
+        // Error handling for global errors
+        window.addEventListener('error', function(e) {
+            console.error('Global error:', e.error);
+            if (e.error && e.error.message && e.error.message.includes('localStorage')) {
+                showMessage('Error de almacenamiento. Los datos pueden no guardarse correctamente.', 'warning');
+            }
+        });
+
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('Unhandled promise rejection:', e.reason);
+        });
+
+        // Page visibility API for better mobile experience
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden && isLocalStorageAvailable()) {
+                // Page became visible, check for updates
+                setTimeout(checkForUpdates, 1000);
+            }
+        });
     </script>
 </body>
-</html>
+</html>group">
+                    <label for="eventCenter">🏛️ Centro de Eventos</label>
+                    <input type="text" id="eventCenter" placeholder="Escribe el nombre del centro: Ej. Salón Principal, Terraza Garden, etc." required>
+                </div>
+
+                <div class="form-group">
+                    <label for="eventDate">📅 Fecha del Evento</label>
+                    <input type="date" id="eventDate" required>
+                </div>
+
+                <div class="form-
