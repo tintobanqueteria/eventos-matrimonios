@@ -1,598 +1,1844 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes"
-  />
-  <title>Eventos de la Semana - Banquetera</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      padding: 10px;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-      overflow: hidden;
-    }
-    .header {
-      background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-      color: white;
-      padding: 30px;
-      text-align: center;
-    }
-    .header h1 { font-size: 2.5em; margin-bottom: 10px; }
-    .header p { opacity: 0.9; font-size: 1.2em; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eventos de la Semana - Banquetera</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    .admin-toggle {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: rgba(255, 255, 255, 0.9);
-      padding: 8px 12px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 0.8em;
-      color: #333;
-      border: none;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-      z-index: 1000;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
-    }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-    .password-modal {
-      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8); z-index: 3000; justify-content: center; align-items: center;
-    }
-    .password-modal.active { display: flex; }
-    .password-content {
-      background: white; padding: 30px; border-radius: 15px; max-width: 400px; width: 90%;
-      text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-    }
-    .password-input {
-      width: 100%; padding: 15px; border: 2px solid #e9ecef; border-radius: 10px;
-      font-size: 16px; margin: 20px 0; text-align: center;
-    }
-    .password-input:focus { outline: none; border-color: #ff6b6b; }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
 
-    .admin-panel { display: none; background: #f8f9fa; border-bottom: 3px solid #dee2e6; padding: 30px; }
-    .admin-panel.active { display: block; }
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
 
-    .main-content { padding: 40px 30px; }
-    .week-info {
-      text-align: center; background: #f8f9fa; padding: 25px; border-radius: 15px; margin-bottom: 30px;
-    }
-    .week-info h2 { color: #ff6b6b; font-size: 2em; margin-bottom: 10px; }
-    .week-dates { color: #666; font-size: 1.1em; }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
 
-    .events-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 25px; margin-bottom: 40px;
-    }
-    .event-card {
-      background: white; border: 3px solid #e9ecef; border-radius: 20px; padding: 25px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1); transition: all 0.3s ease; cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .event-card:hover, .event-card:active {
-      transform: translateY(-5px); box-shadow: 0 20px 50px rgba(0,0,0,0.15); border-color: #ff6b6b;
-    }
-    .event-header {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f1f3f4;
-    }
-    .event-title { color: #ff6b6b; font-size: 1.6em; font-weight: bold; }
-    .event-date {
-      background: linear-gradient(135deg, #ff6b6b, #ee5a24); color: white;
-      padding: 8px 15px; border-radius: 20px; font-size: 0.9em; font-weight: bold;
-    }
-    .event-info { margin-bottom: 25px; }
-    .event-info p {
-      margin-bottom: 10px; color: #666; display: flex; align-items: center; gap: 10px; font-size: 1.1em;
-    }
-    .event-info strong { color: #333; min-width: 100px; }
+        .header p {
+            opacity: 0.9;
+            font-size: 1.2em;
+        }
 
-    .roles-container {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 15px; margin-top: 25px;
-    }
-    .role-button {
-      background: linear-gradient(135deg, #f8f9fa, #e9ecef); border: 2px solid #dee2e6; padding: 20px;
-      border-radius: 15px; cursor: pointer; transition: all 0.3s ease; text-align: center; font-weight: bold; color: #495057;
-      -webkit-tap-highlight-color: transparent; touch-action: manipulation;
-    }
-    .role-button:hover, .role-button:active { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-    .role-button.supervisor { border-color: #007bff; color: #007bff; }
-    .role-button.supervisor:hover, .role-button.supervisor:active {
-      background: linear-gradient(135deg, #007bff, #0056b3); color: white; box-shadow: 0 10px 25px rgba(0,123,255,0.3);
-    }
-    .role-button.supermetre { border-color: #28a745; color: #28a745; }
-    .role-button.supermetre:hover, .role-button.supermetre:active {
-      background: linear-gradient(135deg, #28a745, #1e7e34); color: white; box-shadow: 0 10px 25px rgba(40,167,69,0.3);
-    }
-    .role-button.cocina { border-color: #dc3545; color: #dc3545; }
-    .role-button.cocina:hover, .role-button.cocina:active {
-      background: linear-gradient(135deg, #dc3545, #c82333); color: white; box-shadow: 0 10px 25px rgba(220,53,69,0.3);
-    }
-    .role-emoji { font-size: 2.5em; display: block; margin-bottom: 10px; }
-    .role-name { font-size: 1.2em; font-weight: bold; }
+        .admin-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8em;
+            color: #333;
+            border: none;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
 
-    .modal {
-      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8); z-index: 2000; overflow-y: auto; -webkit-overflow-scrolling: touch;
-    }
-    .modal.active { display: flex; align-items: center; justify-content: center; padding: 20px; }
-    .modal-content {
-      background: white; border-radius: 20px; padding: 40px; max-width: 800px; width: 100%;
-      max-height: 90vh; overflow-y: auto; -webkit-overflow-scrolling: touch; position: relative;
-    }
-    .modal-header {
-      text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #f1f3f4;
-    }
-    .modal-title { color: #ff6b6b; font-size: 2em; margin-bottom: 10px; }
-    .close-btn {
-      position: absolute; top: 20px; right: 25px; background: none; border: none;
-      font-size: 2em; cursor: pointer; color: #999; -webkit-tap-highlight-color: transparent; touch-action: manipulation;
-    }
-    .close-btn:hover, .close-btn:active { color: #333; }
+        .password-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 3000;
+            justify-content: center;
+            align-items: center;
+        }
 
-    .documents-list { display: grid; gap: 15px; }
-    .document-item {
-      display: flex; justify-content: space-between; align-items: center; padding: 20px;
-      background: #f8f9fa; border-radius: 15px; border-left: 5px solid #ff6b6b; transition: all 0.3s ease;
-    }
-    .document-item:hover, .document-item:active { transform: translateX(5px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-    .document-info { display: flex; align-items: center; gap: 15px; }
-    .document-icon { font-size: 2em; }
-    .document-details h4 { color: #333; margin-bottom: 5px; }
-    .document-details p { color: #666; font-size: 0.9em; }
-    .view-btn {
-      background: linear-gradient(135deg, #ff6b6b, #ee5a24); color: white; border: none; padding: 12px 25px;
-      border-radius: 10px; cursor: pointer; font-weight: bold; transition: all 0.3s ease;
-      -webkit-tap-highlight-color: transparent; touch-action: manipulation;
-    }
-    .view-btn:hover, .view-btn:active { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(255,107,107,0.3); }
+        .password-modal.active {
+            display: flex;
+        }
 
-    .empty-state { text-align: center; padding: 60px 20px; color: #666; }
-    .empty-state .emoji { font-size: 5em; margin-bottom: 20px; opacity: 0.5; }
-    .empty-state h3 { margin-bottom: 15px; }
+        .password-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
 
-    .debug-info { margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 10px; font-size: 0.8em; color: #666; border-left: 4px solid #007bff; }
+        .password-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1.1em;
+            margin: 20px 0;
+            text-align: center;
+        }
 
-    .form-group { margin-bottom: 25px; }
-    .form-group label { display: block; font-weight: 600; margin-bottom: 8px; color: #333; }
-    .form-group input, .form-group select, .form-group textarea {
-      width: 100%; padding: 12px 15px; border: 2px solid #e9ecef; border-radius: 10px; font-size: 16px; transition: border-color 0.3s ease;
-    }
-    .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #ff6b6b; }
+        .password-input:focus {
+            outline: none;
+            border-color: #ff6b6b;
+        }
 
-    .btn {
-      padding: 12px 30px; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer;
-      transition: all 0.3s ease; margin-right: 10px; margin-bottom: 10px; -webkit-tap-highlight-color: transparent; touch-action: manipulation;
-    }
-    .btn-primary { background: linear-gradient(135deg, #ff6b6b, #ee5a24); color: white; }
-    .btn-danger { background: linear-gradient(135deg, #ff4757, #ff3742); color: white; }
-    .btn-success { background: linear-gradient(135deg, #2ed573, #1e90ff); color: white; }
-    .btn-warning { background: linear-gradient(135deg, #ffa502, #ff6b35); color: white; }
-    .btn-secondary { background: linear-gradient(135deg, #6c757d, #495057); color: white; }
-    .btn:hover, .btn:active { transform: translateY(-2px); }
+        .admin-panel {
+            display: none;
+            background: #f8f9fa;
+            border-bottom: 3px solid #dee2e6;
+            padding: 30px;
+        }
 
-    .file-upload-area {
-      border: 3px dashed #dee2e6; border-radius: 15px; padding: 40px; text-align: center; background: #f8f9fa;
-      cursor: pointer; transition: all 0.3s ease; -webkit-tap-highlight-color: transparent;
-    }
-    .file-upload-area:hover, .file-upload-area:active { border-color: #ff6b6b; background: rgba(255,107,107,0.1); }
+        .admin-panel.active {
+            display: block;
+        }
 
-    .success-message {
-      background: #d4edda; color: #155724; padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 5px solid #28a745;
-    }
-    .warning-message {
-      background: #fff3cd; color: #856404; padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 5px solid #ffc107;
-    }
+        .main-content {
+            padding: 40px 30px;
+        }
 
-    .events-admin { margin-top: 30px; }
-    .admin-event-card { background: white; border: 2px solid #e9ecef; border-radius: 15px; padding: 20px; margin-bottom: 20px; }
-    .admin-tools { background: white; padding: 20px; border-radius: 15px; margin-bottom: 25px; border: 2px solid #e9ecef; }
-    .document-assignment { margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 15px; border: 2px solid #e9ecef; }
-    .assignment-header {
-      display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #dee2e6;
-    }
-    .document-name { font-weight: bold; color: #333; }
-    .role-checkboxes { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
-    .role-checkbox {
-      display: flex; align-items: center; gap: 8px; padding: 8px 15px; background: white; border: 2px solid #dee2e6;
-      border-radius: 25px; cursor: pointer; transition: all 0.3s ease; -webkit-tap-highlight-color: transparent;
-    }
-    .role-checkbox input[type="checkbox"] { margin: 0; width: auto; padding: 0; }
-    .role-checkbox.supervisor { border-color: #007bff; color: #007bff; }
-    .role-checkbox.supervisor input:checked { accent-color: #007bff; }
-    .role-checkbox.supermetre { border-color: #28a745; color: #28a745; }
-    .role-checkbox.supermetre input:checked { accent-color: #28a745; }
-    .role-checkbox.cocina { border-color: #dc3545; color: #dc3545; }
-    .role-checkbox.cocina input:checked { accent-color: #dc3545; }
+        .week-info {
+            text-align: center;
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
 
-    .remove-file-btn {
-      background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 5px;
-      cursor: pointer; font-size: 0.8em; -webkit-tap-highlight-color: transparent;
-    }
-    .edit-mode { background: #fff3cd; border: 2px solid #ffc107; }
-    .edit-mode .modal-title { color: #856404; }
+        .week-info h2 {
+            color: #ff6b6b;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
 
-    /* Mobile */
-    @media (max-width: 768px) {
-      body { padding: 5px; }
-      .container { border-radius: 10px; }
-      .header { padding: 20px 15px; }
-      .header h1 { font-size: 1.8em; }
-      .header p { font-size: 1em; }
-      .main-content { padding: 20px 15px; }
-      .admin-panel { padding: 20px 15px; }
-      .events-grid { grid-template-columns: 1fr; gap: 15px; }
-      .event-card { padding: 15px; margin-bottom: 0; }
-      .event-header { flex-direction: column; align-items: stretch; gap: 10px; text-align: center; }
-      .event-title { font-size: 1.3em; order: 1; }
-      .event-date { order: 2; align-self: center; padding: 6px 12px; font-size: 0.8em; }
-      .roles-container { grid-template-columns: 1fr; gap: 12px; }
-      .role-button { padding: 15px; font-size: 1em; }
-      .role-emoji { font-size: 2em; }
-      .modal-content { padding: 20px 15px; margin: 10px; max-height: 85vh; }
-      .modal-title { font-size: 1.5em; }
-      .document-item { flex-direction: column; gap: 15px; text-align: center; padding: 15px; }
-      .document-info { justify-content: center; flex-direction: column; text-align: center; }
-      .view-btn { width: 100%; padding: 15px; }
+        .week-dates {
+            color: #666;
+            font-size: 1.1em;
+        }
 
-      .admin-toggle {
-        position: relative; top: 0; right: 0; margin: 10px auto; display: block; width: fit-content;
-        font-size: 0.9em; padding: 12px 20px;
-      }
-      .role-checkboxes { flex-direction: column; align-items: stretch; gap: 10px; }
-      .role-checkbox { justify-content: center; padding: 12px 15px; }
-      .btn { width: 100%; margin-right: 0; margin-bottom: 8px; padding: 15px 20px; font-size: 16px; }
-      .week-info { padding: 20px 15px; }
-      .week-info h2 { font-size: 1.5em; }
-      .admin-event-card { padding: 15px; }
-      .admin-event-card > div:first-child { flex-direction: column; align-items: stretch; gap: 15px; }
-      .admin-event-card h4 { font-size: 1.2em; }
-      .password-content { padding: 25px 20px; margin: 15px; }
-      .event-info p { font-size: 1em; flex-wrap: wrap; }
-      .event-info strong { min-width: auto; margin-right: 5px; }
-      .empty-state { padding: 30px 15px; }
-      .empty-state .emoji { font-size: 3em; }
-      .file-upload-area { padding: 30px 15px; }
-      .document-assignment { padding: 15px; }
-      .assignment-header { flex-direction: column; gap: 10px; text-align: center; }
-      .admin-tools { text-align: center; }
-      .debug-info { text-align: left; font-size: 0.75em; }
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
 
-      .admin-tools > div { display: flex; flex-direction: column; gap: 10px; }
-      .admin-tools .btn { margin: 0; width: 100%; }
-    }
+        .event-card {
+            background: white;
+            border: 3px solid #e9ecef;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
 
-    /* iOS specific fixes (SEGURO) — sin bloquear scroll global */
-    @supports (-webkit-overflow-scrolling: touch) {
-      .modal, .modal-content { -webkit-overflow-scrolling: touch; }
-      body.modal-open { overflow: hidden; height: 100vh; }
-    }
+        .event-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            border-color: #ff6b6b;
+        }
 
-    /* Ajuste extra para columnas angostas */
-    @media (max-width: 400px) {
-      .events-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
-    }
-  </style>
+        .event-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f1f3f4;
+        }
+
+        .event-title {
+            color: #ff6b6b;
+            font-size: 1.6em;
+            font-weight: bold;
+        }
+
+        .event-date {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .event-info {
+            margin-bottom: 25px;
+        }
+
+        .event-info p {
+            margin-bottom: 10px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1em;
+        }
+
+        .event-info strong {
+            color: #333;
+            min-width: 100px;
+        }
+
+        .roles-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .role-button {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border: 2px solid #dee2e6;
+            padding: 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: bold;
+            color: #495057;
+        }
+
+        .role-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .role-button.supervisor {
+            border-color: #007bff;
+            color: #007bff;
+        }
+
+        .role-button.supervisor:hover {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            box-shadow: 0 10px 25px rgba(0, 123, 255, 0.3);
+        }
+
+        .role-button.supermetre {
+            border-color: #28a745;
+            color: #28a745;
+        }
+
+        .role-button.supermetre:hover {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+            color: white;
+            box-shadow: 0 10px 25px rgba(40, 167, 69, 0.3);
+        }
+
+        .role-button.cocina {
+            border-color: #dc3545;
+            color: #dc3545;
+        }
+
+        .role-button.cocina:hover {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            box-shadow: 0 10px 25px rgba(220, 53, 69, 0.3);
+        }
+
+        .role-emoji {
+            font-size: 2.5em;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .role-name {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f1f3f4;
+        }
+
+        .modal-title {
+            color: #ff6b6b;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            background: none;
+            border: none;
+            font-size: 2em;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .documents-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .document-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border-left: 5px solid #ff6b6b;
+            transition: all 0.3s ease;
+        }
+
+        .document-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .document-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .document-icon {
+            font-size: 2em;
+        }
+
+        .document-details h4 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .document-details p {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .view-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .view-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-state .emoji {
+            font-size: 5em;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 15px;
+        }
+
+        /* Estilos del panel de administración */
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #ff6b6b;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff4757, #ff3742);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #2ed573, #1e90ff);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ffa502, #ff6b35);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d, #495057);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .file-upload-area {
+            border: 3px dashed #dee2e6;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-area:hover {
+            border-color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 5px solid #28a745;
+        }
+
+        .warning-message {
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 5px solid #ffc107;
+        }
+
+        .events-admin {
+            margin-top: 30px;
+        }
+
+        .admin-event-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .admin-tools {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border: 2px solid #e9ecef;
+        }
+
+        /* Nuevos estilos para asignación manual de documentos */
+        .document-assignment {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+        }
+
+        .assignment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .document-name {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .role-checkboxes {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .role-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .role-checkbox input[type="checkbox"] {
+            margin: 0;
+            width: auto;
+            padding: 0;
+        }
+
+        .role-checkbox.supervisor {
+            border-color: #007bff;
+            color: #007bff;
+        }
+
+        .role-checkbox.supervisor input:checked {
+            accent-color: #007bff;
+        }
+
+        .role-checkbox.supermetre {
+            border-color: #28a745;
+            color: #28a745;
+        }
+
+        .role-checkbox.supermetre input:checked {
+            accent-color: #28a745;
+        }
+
+        .role-checkbox.cocina {
+            border-color: #dc3545;
+            color: #dc3545;
+        }
+
+        .role-checkbox.cocina input:checked {
+            accent-color: #dc3545;
+        }
+
+        .remove-file-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+
+        .edit-mode {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+        }
+
+        .edit-mode .modal-title {
+            color: #856404;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                border-radius: 15px;
+            }
+
+            .header {
+                padding: 20px 15px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .main-content {
+                padding: 20px 15px;
+            }
+
+            .admin-panel {
+                padding: 20px 15px;
+            }
+
+            .events-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .event-card {
+                padding: 20px;
+                margin-bottom: 0;
+            }
+
+            .event-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+
+            .event-title {
+                font-size: 1.4em;
+                text-align: center;
+            }
+
+            .event-date {
+                align-self: center;
+                padding: 6px 12px;
+                font-size: 0.85em;
+            }
+            
+            .roles-container {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .role-button {
+                padding: 18px;
+                font-size: 1em;
+            }
+
+            .role-emoji {
+                font-size: 2.2em;
+            }
+            
+            .modal-content {
+                padding: 20px 15px;
+                margin: 10px;
+                max-height: 85vh;
+            }
+
+            .modal-title {
+                font-size: 1.6em;
+            }
+
+            .document-item {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+                padding: 15px;
+            }
+
+            .document-info {
+                justify-content: center;
+            }
+
+            .view-btn {
+                width: 100%;
+                padding: 12px;
+            }
+            
+            .admin-toggle {
+                position: static;
+                margin-bottom: 15px;
+                display: block;
+                text-align: center;
+                width: auto;
+                font-size: 0.9em;
+                padding: 12px 20px;
+            }
+
+            .role-checkboxes {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+
+            .role-checkbox {
+                justify-content: center;
+                padding: 12px 15px;
+            }
+
+            .btn {
+                margin-right: 5px;
+                margin-bottom: 8px;
+                padding: 10px 20px;
+                font-size: 0.9em;
+            }
+
+            .form-group input,
+            .form-group textarea {
+                font-size: 16px; /* Evita zoom en iOS */
+            }
+
+            .week-info {
+                padding: 20px 15px;
+            }
+
+            .week-info h2 {
+                font-size: 1.6em;
+            }
+
+            .admin-event-card {
+                padding: 15px;
+            }
+
+            .admin-event-card > div:first-child {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+            }
+
+            .admin-event-card h4 {
+                font-size: 1.2em;
+            }
+
+            .password-content {
+                padding: 25px 20px;
+                margin: 15px;
+            }
+
+            .password-input {
+                font-size: 16px; /* Evita zoom en iOS */
+            }
+
+            /* Mejoras adicionales para móvil */
+            .event-info p {
+                font-size: 1em;
+                flex-wrap: wrap;
+            }
+
+            .event-info strong {
+                min-width: auto;
+                margin-right: 5px;
+            }
+
+            .empty-state {
+                padding: 40px 15px;
+            }
+
+            .empty-state .emoji {
+                font-size: 4em;
+            }
+
+            .file-upload-area {
+                padding: 30px 15px;
+            }
+
+            .document-assignment {
+                padding: 15px;
+            }
+
+            .assignment-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .admin-tools {
+                text-align: center;
+            }
+
+            .stats-container p {
+                font-size: 0.95em;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="admin-toggle-container" style="text-align: center; padding: 10px;">
     <button class="admin-toggle" onclick="requestAdminAccess()">🔧 Admin</button>
-  </div>
 
-  <!-- Modal contraseña -->
-  <div id="passwordModal" class="password-modal">
-    <div class="password-content">
-      <h3 style="color: #ff6b6b; margin-bottom: 15px;">🔐 Acceso Administrativo</h3>
-      <p style="color: #666; margin-bottom: 20px;">Introduce la contraseña para acceder al panel administrativo</p>
-      <input type="password" id="passwordInput" class="password-input" placeholder="Contraseña" maxlength="20" autocomplete="off">
-      <div style="margin-top: 20px;">
-        <button class="btn btn-primary" onclick="checkPassword()" style="margin-right: 10px;">✅ Acceder</button>
-        <button class="btn btn-secondary" onclick="closePasswordModal()">❌ Cancelar</button>
-      </div>
-      <div id="passwordError" style="color: #dc3545; margin-top: 15px; display: none;">❌ Contraseña incorrecta</div>
-    </div>
-  </div>
-
-  <div class="container">
-    <!-- Panel Admin -->
-    <div id="adminPanel" class="admin-panel">
-      <h2 style="color: #ff6b6b; margin-bottom: 25px;">🔧 Panel de Administración</h2>
-
-      <div class="admin-tools">
-        <h3 style="margin-bottom: 15px;">⚙️ Herramientas de Gestión</h3>
-        <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
-          <button class="btn btn-warning" onclick="cleanOldEventsManual()">🧹 Limpiar Eventos Antiguos</button>
-          <button class="btn btn-success" onclick="exportData()">📤 Exportar Datos</button>
-          <label class="btn btn-secondary" style="cursor: pointer;">
-            📥 Importar Datos
-            <input type="file" accept=".json" onchange="importData(event)" style="display: none;">
-          </label>
-          <button class="btn btn-primary" onclick="generateShareLink()">🔗 Crear Link de Sincronización</button>
-          <button class="btn btn-warning" onclick="createDemoEvents()">🎭 Crear Eventos de Prueba</button>
+    <!-- Modal para contraseña -->
+    <div id="passwordModal" class="password-modal">
+        <div class="password-content">
+            <h3 style="color: #ff6b6b; margin-bottom: 15px;">🔐 Acceso Administrativo</h3>
+            <p style="color: #666; margin-bottom: 20px;">Introduce la contraseña para acceder al panel administrativo</p>
+            <input type="password" id="passwordInput" class="password-input" placeholder="Contraseña" maxlength="20">
+            <div style="margin-top: 20px;">
+                <button class="btn btn-primary" onclick="checkPassword()" style="margin-right: 10px;">✅ Acceder</button>
+                <button class="btn btn-secondary" onclick="closePasswordModal()">❌ Cancelar</button>
+            </div>
+            <div id="passwordError" style="color: #dc3545; margin-top: 15px; display: none;">
+                ❌ Contraseña incorrecta
+            </div>
         </div>
-        <div id="shareLink" style="margin-top: 15px; display: none; background: #e7f3ff; padding: 15px; border-radius: 10px;">
-          <p><strong>📱 Link para Móviles:</strong></p>
-          <input type="text" id="shareLinkInput" readonly
-                 style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; margin: 10px 0; font-size: 14px;">
-          <div style="text-align: center;">
-            <button class="btn btn-success" onclick="copyShareLink()">📋 Copiar Link</button>
-            <button class="btn btn-secondary" onclick="hideShareLink()">❌ Cerrar</button>
-          </div>
-          <div style="margin-top: 15px; font-size: 0.9em; color: #666;">
-            <p><strong>📱 Instrucciones:</strong></p>
-            <p>1. Copia este link</p>
-            <p>2. Envíalo por WhatsApp o email a los móviles</p>
-            <p>3. Al abrirlo, los eventos se cargan automáticamente</p>
-          </div>
-        </div>
-      </div>
-
-      <div style="background: white; padding: 25px; border-radius: 15px; margin-bottom: 25px;">
-        <h3>📊 Resumen</h3>
-        <p><strong>Total eventos:</strong> <span id="eventCount">0</span></p>
-        <p><strong>Total documentos:</strong> <span id="docCount">0</span></p>
-        <p><strong>LocalStorage disponible:</strong> <span id="storageStatus">Verificando...</span></p>
-        <p><strong>Navegador:</strong> <span id="browserInfo">-</span></p>
-      </div>
-
-      <div id="editEventContainer" style="display: none;" class="edit-mode">
-        <h3 style="color: #856404; margin-bottom: 20px;">✏️ Editando Evento</h3>
-        <button class="btn btn-secondary" onclick="cancelEdit()">❌ Cancelar Edición</button>
-      </div>
-
-      <!-- Formulario de evento -->
-      <form id="eventForm">
-        <div class="form-group">
-          <label for="eventCenter">🏛️ Centro de Eventos</label>
-          <input type="text" id="eventCenter"
-                 placeholder="Escribe el nombre del centro: Ej. Salón Principal, Terraza Garden, etc."
-                 required>
-        </div>
-
-        <div class="form-group">
-          <label for="eventDate">📅 Fecha del Evento</label>
-          <input type="date" id="eventDate" required>
-        </div>
-
-        <div class="form-group">
-          <label for="eventTime">⏰ Hora de Inicio</label>
-          <input type="time" id="eventTime" value="19:00" required>
-        </div>
-
-        <div class="form-group">
-          <label for="guestCount">👥 Número de Invitados</label>
-          <input type="number" id="guestCount" placeholder="Ej: 150" min="1" required>
-        </div>
-
-        <div class="form-group">
-          <label for="observations">📝 Observaciones</label>
-          <textarea id="observations" rows="3" placeholder="Alergias, decoración especial, etc."></textarea>
-        </div>
-
-        <div class="form-group">
-          <label>📄 Documentos y Asignación por Roles</label>
-          <div class="file-upload-area" onclick="document.getElementById('fileInput').click()">
-            <div style="font-size: 3em; margin-bottom: 15px;">📄</div>
-            <p><strong>Subir documentos PDF</strong></p>
-            <p>Después podrás asignar cada documento a los roles correspondientes</p>
-          </div>
-          <input type="file" id="fileInput" multiple accept=".pdf" style="display: none;">
-          <div id="documentsAssignment" style="margin-top: 20px;"></div>
-        </div>
-
-        <button type="submit" class="btn btn-primary" id="submitBtn">➕ Agregar Evento</button>
-      </form>
-
-      <div class="events-admin">
-        <h3>📋 Todos los Eventos</h3>
-        <div id="adminEventsList"></div>
-      </div>
     </div>
 
-    <!-- Contenido principal -->
-    <div class="header">
-      <h1>🍽️ Eventos de la Semana</h1>
-      <p>Selecciona tu evento y después tu rol para ver los documentos</p>
+    <div class="container">
+        <!-- Panel de Administración (Oculto por defecto) -->
+        <div id="adminPanel" class="admin-panel">
+            <h2 style="color: #ff6b6b; margin-bottom: 25px;">🔧 Panel de Administración</h2>
+            
+            <div class="admin-tools">
+                <h3 style="margin-bottom: 15px;">⚙️ Herramientas de Gestión</h3>
+                <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
+                    <button class="btn btn-warning" onclick="cleanOldEventsManual()">🧹 Limpiar Eventos Antiguos</button>
+                    <button class="btn btn-success" onclick="exportData()">📤 Exportar Datos</button>
+                    <label class="btn btn-secondary" style="cursor: pointer;">
+                        📥 Importar Datos
+                        <input type="file" accept=".json" onchange="importData(event)" style="display: none;">
+                    </label>
+                    <button class="btn btn-primary" onclick="generateShareLink()">🔗 Crear Link de Sincronización</button>
+                </div>
+                <div id="shareLink" style="margin-top: 15px; display: none; background: #e7f3ff; padding: 15px; border-radius: 10px;">
+                    <p><strong>📱 Link para Móviles:</strong></p>
+                    <input type="text" id="shareLinkInput" readonly style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; margin: 10px 0;">
+                    <div style="text-align: center;">
+                        <button class="btn btn-success" onclick="copyShareLink()">📋 Copiar Link</button>
+                        <button class="btn btn-secondary" onclick="hideShareLink()">❌ Cerrar</button>
+                    </div>
+                    <div style="margin-top: 15px; font-size: 0.9em; color: #666;">
+                        <p><strong>📱 Instrucciones:</strong></p>
+                        <p>1. Copia este link</p>
+                        <p>2. Envíalo por WhatsApp o email a los móviles</p>
+                        <p>3. Al abrirlo, los eventos se cargan automáticamente</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="background: white; padding: 25px; border-radius: 15px; margin-bottom: 25px;">
+                <h3>📊 Resumen</h3>
+                <p><strong>Total eventos:</strong> <span id="eventCount">0</span></p>
+                <p><strong>Total documentos:</strong> <span id="docCount">0</span></p>
+            </div>
+
+            <div id="editEventContainer" style="display: none;" class="edit-mode">
+                <h3 style="color: #856404; margin-bottom: 20px;">✏️ Editando Evento</h3>
+                <button class="btn btn-secondary" onclick="cancelEdit()">❌ Cancelar Edición</button>
+            </div>
+
+            <form id="eventForm">
+                <div class="form-group">
+                    <label for="eventCenter">🏛️ Centro de Eventos</label>
+                    <input type="text" id="eventCenter" placeholder="Escribe el nombre del centro: Ej. Salón Principal, Terraza Garden, etc." required>
+                </div>
+
+                <div class="form-group">
+                    <label for="eventDate">📅 Fecha del Evento</label>
+                    <input type="date" id="eventDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="eventTime">⏰ Hora de Inicio</label>
+                    <input type="time" id="eventTime" value="19:00" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="guestCount">👥 Número de Invitados</label>
+                    <input type="number" id="guestCount" placeholder="Ej: 150" min="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="observations">📝 Observaciones</label>
+                    <textarea id="observations" rows="3" placeholder="Alergias, decoración especial, etc."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>📄 Documentos y Asignación por Roles</label>
+                    <div class="file-upload-area" onclick="document.getElementById('fileInput').click()">
+                        <div style="font-size: 3em; margin-bottom: 15px;">📄</div>
+                        <p><strong>Subir documentos PDF</strong></p>
+                        <p>Después podrás asignar cada documento a los roles correspondientes</p>
+                    </div>
+                    <input type="file" id="fileInput" multiple accept=".pdf" style="display: none;">
+                    <div id="documentsAssignment" style="margin-top: 20px;">
+                        <!-- Aquí se mostrarán los documentos para asignar roles -->
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="submitBtn">➕ Agregar Evento</button>
+            </form>
+
+            <div class="events-admin">
+                <h3>📋 Todos los Eventos</h3>
+                <div id="adminEventsList"></div>
+            </div>
+        </div>
+
+        <!-- Contenido Principal -->
+        <div class="header">
+            <h1>🍽️ Eventos de la Semana</h1>
+            <p>Selecciona tu evento y después tu rol para ver los documentos</p>
+        </div>
+
+        <div class="main-content">
+            <div class="week-info">
+                <h2 id="currentWeek">Eventos Disponibles</h2>
+                <div class="week-dates" id="weekDates">Mostrando todos los eventos activos</div>
+            </div>
+
+            <div id="eventsContainer" class="events-grid">
+                <!-- Los eventos se cargarán aquí -->
+            </div>
+        </div>
     </div>
 
-    <div class="main-content">
-      <div class="week-info">
-        <h2 id="currentWeek">Eventos Disponibles</h2>
-        <div class="week-dates" id="weekDates">Mostrando todos los eventos activos</div>
-      </div>
-      <div id="eventsContainer" class="events-grid"></div>
+    <!-- Modal para mostrar documentos -->
+    <div id="documentsModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">Documentos</div>
+                <div id="modalSubtitle" style="color: #666;"></div>
+            </div>
+            <div id="modalDocuments" class="documents-list">
+                <!-- Los documentos se cargarán aquí -->
+            </div>
+        </div>
     </div>
-  </div>
 
-  <!-- Modal documentos -->
-  <div id="documentsModal" class="modal">
-    <div class="modal-content">
-      <button class="close-btn" onclick="closeModal()">&times;</button>
-      <div class="modal-header">
-        <div class="modal-title" id="modalTitle">Documentos</div>
-        <div id="modalSubtitle" style="color: #666;"></div>
-      </div>
-      <div id="modalDocuments" class="documents-list"></div>
-    </div>
-  </div>
+    <script>
+        // Estado global
+        let events = JSON.parse(localStorage.getItem('banquetera_events')) || [];
+        let adminPanelVisible = false;
+        let currentFiles = [];
+        let editingEventId = null;
+        let isAuthenticated = false;
+        const ADMIN_PASSWORD = 'Pagoda1234';
 
-  <script>
-    // Estado global
-    let events = [];
-    let adminPanelVisible = false;
-    let currentFiles = [];
-    let editingEventId = null;
-    let isAuthenticated = false;
-    const ADMIN_PASSWORD = 'Pagoda1234';
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar si hay datos en la URL (para sincronización)
+            checkForSyncData();
+            
+            // Forzar recarga de eventos al inicio
+            events = JSON.parse(localStorage.getItem('banquetera_events')) || [];
+            console.log('Iniciando sistema con', events.length, 'eventos');
+            
+            updateWeekInfo();
+            displayEvents();
+            updateAdminInfo();
+            setupFileUpload();
+            setDefaultDate();
+            setupMobileOptimizations();
+            
+            // Recargar eventos cada 30 segundos para sincronización
+            setInterval(() => {
+                const newEvents = JSON.parse(localStorage.getItem('banquetera_events')) || [];
+                if (newEvents.length !== events.length) {
+                    console.log('Detectados cambios en eventos, recargando...');
+                    events = newEvents;
+                    displayEvents();
+                }
+            }, 30000);
+        });
 
-    // Mobile detection
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-
-    // localStorage seguro
-    function isLocalStorageAvailable() {
-      try {
-        const test='__localStorage_test__';
-        localStorage.setItem(test,test);
-        localStorage.removeItem(test);
-        return true;
-      } catch(e) {
-        console.warn('LocalStorage not available:', e.name);
-        return false;
-      }
-    }
-    function safeGetFromStorage(key) {
-      try {
-        if (!isLocalStorageAvailable()) return [];
-        const data = localStorage.getItem(key);
-        if (!data) return [];
-        const parsed = JSON.parse(data);
-        return Array.isArray(parsed) ? parsed : [];
-      } catch(e) { console.error('Error reading storage:', e); return []; }
-    }
-    function safeSetToStorage(key, data) {
-      try {
-        if (!isLocalStorageAvailable()) return false;
-        if (!Array.isArray(data)) return false;
-        localStorage.setItem(key, JSON.stringify(data));
-        return true;
-      } catch(e) {
-        console.error('Error writing storage:', e);
-        if (e.name === 'QuotaExceededError') alert('Espacio de almacenamiento lleno. Elimina eventos antiguos.');
-        return false;
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-      // iOS: permitir scroll normal, solo bloquear con modal-open (CSS ya lo maneja)
-      if (isMobile) {
-        document.body.addEventListener('touchstart', function(){}, {passive:true});
-      }
-
-      const statusEl = document.getElementById('storageStatus');
-      const browserEl = document.getElementById('browserInfo');
-      const storageAvailable = isLocalStorageAvailable();
-      if (statusEl) statusEl.textContent = storageAvailable ? 'Disponible' : 'No disponible';
-      if (browserEl) browserEl.textContent = navigator.userAgent.split(' ')[0];
-
-      if (!storageAvailable) showMessage('Advertencia: Los datos no se guardarán en este navegador', 'warning');
-
-      checkForSyncData();
-
-      try {
-        events = safeGetFromStorage('banquetera_events');
-      } catch(e) { events = []; }
-
-      updateWeekInfo();
-      displayEvents();
-      updateAdminInfo();
-      setupFileUpload();
-      setDefaultDate();
-      setupEventListeners();
-
-      if (storageAvailable) setInterval(checkForUpdates, 30000);
-    });
-
-    // Sync via URL ?sync=
-    function checkForSyncData() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const syncData = urlParams.get('sync');
-      if (!syncData) return;
-
-      try {
-        const decoded = atob(syncData);
-        const importedEvents = JSON.parse(decoded);
-        if (importedEvents && Array.isArray(importedEvents) && importedEvents.length > 0) {
-          const ok = confirm(`Se detectaron ${importedEvents.length} eventos para sincronizar.\n\n¿Deseas cargar estos eventos?`);
-          if (ok) {
-            events = importedEvents;
-            if (safeSetToStorage('banquetera_events', events)) {
-              showMessage(`${importedEvents.length} eventos sincronizados correctamente!`);
+        // Función para verificar datos de sincronización en la URL
+        function checkForSyncData() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const syncData = urlParams.get('sync');
+            
+            if (syncData) {
+                try {
+                    const decodedData = atob(syncData);
+                    const importedEvents = JSON.parse(decodedData);
+                    
+                    if (importedEvents && importedEvents.length > 0) {
+                        // Mostrar mensaje de confirmación
+                        if (confirm(`📱 Se han detectado ${importedEvents.length} eventos para sincronizar.\n\n¿Deseas cargar estos eventos en este dispositivo?`)) {
+                            events = importedEvents;
+                            localStorage.setItem('banquetera_events', JSON.stringify(events));
+                            
+                            // Limpiar la URL para evitar recargas accidentales
+                            window.history.replaceState({}, document.title, window.location.pathname);
+                            
+                            // Mostrar mensaje de éxito
+                            setTimeout(() => {
+                                alert('✅ ¡Eventos sincronizados correctamente!\n\nYa puedes ver todos los eventos en este dispositivo.');
+                                location.reload();
+                            }, 500);
+                        } else {
+                            // Limpiar la URL si el usuario cancela
+                            window.history.replaceState({}, document.title, window.location.pathname);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error al procesar datos de sincronización:', error);
+                    alert('❌ Error al sincronizar datos. El link puede estar corrupto.');
+                }
             }
-            window.history.replaceState({}, document.title, window.location.pathname);
-            setTimeout(() => { displayEvents(); updateAdminInfo(); }, 100);
-          } else {
-            window.history.replaceState({}, document.title, window.location.pathname);
-          }
         }
-      } catch (error) {
-        console.error('Error processing sync data:', error);
-        alert('Error al sincronizar datos. El enlace puede estar corrupto.');
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
-    }
 
-    function checkForUpdates() {
-      try {
-        const newEvents = safeGetFromStorage('banquetera_events');
-        if (newEvents.length !== events.length) {
-          events = newEvents;
-          displayEvents(); updateAdminInfo();
+        // Función para generar link de sincronización
+        function generateShareLink() {
+            if (events.length === 0) {
+                alert('⚠️ No hay eventos para sincronizar. Crea algunos eventos primero.');
+                return;
+            }
+            
+            try {
+                const dataString = JSON.stringify(events);
+                const encodedData = btoa(dataString);
+                const currentUrl = window.location.origin + window.location.pathname;
+                const shareUrl = `${currentUrl}?sync=${encodedData}`;
+                
+                document.getElementById('shareLinkInput').value = shareUrl;
+                document.getElementById('shareLink').style.display = 'block';
+                
+                showMessage(`🔗 Link de sincronización generado con ${events.length} eventos`);
+            } catch (error) {
+                console.error('Error generando link:', error);
+                alert('❌ Error generando link. Los datos pueden ser muy grandes.');
+            }
         }
-      } catch(e) { console.error('Error updates:', e); }
-    }
 
-    function setupEventListeners() {
-      document.getElementById('documentsModal')?.addEventListener('click', function(e){
-        if (e.target === this) closeModal();
-      });
-      document.getElementById('passwordInput')?.addEventListener('keypress', function(e){
-        if (e.key === 'Enter') { e.preventDefault(); checkPassword(); }
-      });
-      document.addEventListener('keydown', function(e){
-        if (e.key === 'Escape') { closePasswordModal(); closeModal(); }
-      });
-      document.getElementById('eventForm')?.addEventListener('submit', handleFormSubmit);
-    }
+        function copyShareLink() {
+            const linkInput = document.getElementById('shareLinkInput');
+            linkInput.select();
+            linkInput.setSelectionRange(0, 99999); // Para móviles
+            
+            try {
+                document.execCommand('copy');
+                showMessage('📋 Link copiado al portapapeles');
+                
+                // También mostrar el link para copiarlo manualmente si falla
+                if (navigator.share && /Android|iPhone|iPad/i.test(navigator.userAgent)) {
+                    navigator.share({
+                        title: 'Eventos Banquetera',
+                        text: 'Link para sincronizar eventos',
+                        url: linkInput.value
+                    });
+                }
+            } catch (err) {
+                console.log('Error copiando:', err);
+                // Fallback: seleccionar texto para copia manual
+                linkInput.focus();
+                linkInput.select();
+                alert('📋 Selecciona y copia manualmente el link que aparece seleccionado');
+            }
+        }
 
-    function handleFormSubmit(e) {
-      e.preventDefault();
-      const center = document.getElementById('eventCenter').value.trim();
-      const date = document.getElementById('eventDate').value;
-      const time = document.getElementById('eventTime').value;
-      const guestCount = document.getElementById('guestCount').value;
+        function hideShareLink() {
+            document.getElementById('shareLink').style.display = 'none';
+        }
 
-      if (!center || !date || !time || !guestCount) {
-        showMessage('Por favor completa todos los campos obligatorios', 'warning');
-        return;
-      }
+        function setupMobileOptimizations() {
+            // Prevenir zoom en inputs en iOS
+            if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+                const viewport = document.querySelector('meta[name=viewport]');
+                if (viewport) {
+                    viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+                }
+            }
 
-      const unassignedFiles = currentFiles.filter(f => !f.roles || f.roles.length === 0);
-      if (unassignedFiles.length > 0) {
-        const fileNames = unassignedFiles.map(f => f.name).join('\n');
-        alert(`Los siguientes documentos no tienen roles asignados:\n\n${fileNames}\n\nAsigna al menos un rol a cada documento o elimínalo.`);
-        return;
-      }
+            // Mejorar experiencia táctil
+            document.addEventListener('touchstart', function() {}, true);
+        }
 
-      const eventData = {
-        center,
-        date,
-        time,
-        guestCount,
-        observations: document.getElementById('observations').value.trim(),
-        documents: currentFiles.map(fd => ({
-          name: fd.name, size: fd.size, url: fd.url, roles: fd.roles || []
-        }))
-      };
+        // Funciones para autenticación
+        function requestAdminAccess() {
+            document.getElementById('passwordModal').classList.add('active');
+            document.getElementById('passwordInput').focus();
+        }
 
-      try {
-        if (editingEventId) {
-          const idx = events.findIndex(e => e.id === editingEventId);
-          if (idx !== -1) {
-            events[idx] = { ...events[idx], ...eventData, updated: new Date().to
+        function closePasswordModal() {
+            document.getElementById('passwordModal').classList.remove('active');
+            document.getElementById('passwordInput').value = '';
+            document.getElementById('passwordError').style.display = 'none';
+        }
+
+        function checkPassword() {
+            const enteredPassword = document.getElementById('passwordInput').value;
+            
+            if (enteredPassword === ADMIN_PASSWORD) {
+                isAuthenticated = true;
+                closePasswordModal();
+                toggleAdminPanel();
+                showMessage('🎉 ¡Acceso autorizado! Bienvenido al panel administrativo');
+            } else {
+                document.getElementById('passwordError').style.display = 'block';
+                document.getElementById('passwordInput').value = '';
+                document.getElementById('passwordInput').focus();
+                
+                // Vibrar en móviles si está disponible
+                if (navigator.vibrate) {
+                    navigator.vibrate(200);
+                }
+            }
+        }
+
+        // Permitir envío con Enter en el campo de contraseña
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    checkPassword();
+                }
+            });
+        });
+
+        // Cerrar modal de contraseña con Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closePasswordModal();
+            }
+        });
+
+        function setDefaultDate() {
+            const today = new Date();
+            document.getElementById('eventDate').value = today.toISOString().split('T')[0];
+        }
+
+        function updateWeekInfo() {
+            document.getElementById('currentWeek').textContent = 'Eventos Disponibles';
+            document.getElementById('weekDates').textContent = 'Mostrando todos los eventos activos';
+        }
+
+        function displayEvents() {
+            const container = document.getElementById('eventsContainer');
+            
+            // Forzar recarga de eventos desde localStorage
+            events = JSON.parse(localStorage.getItem('banquetera_events')) || [];
+            
+            console.log('Eventos cargados:', events.length); // Para debug
+            
+            container.innerHTML = '';
+
+            if (events.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="emoji">📅</div>
+                        <h3>No hay eventos programados</h3>
+                        <p>Los eventos aparecerán aquí cuando sean cargados desde el panel administrativo</p>
+                        <p style="margin-top: 15px; font-size: 0.9em; color: #999;">
+                            💡 <strong>Tip:</strong> Abre el panel administrativo para crear eventos de prueba
+                        </p>
+                        <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 10px; text-align: left;">
+                            <p style="font-size: 0.8em; color: #666;"><strong>Debug Info:</strong></p>
+                            <p style="font-size: 0.8em; color: #666;">Navegador: ${navigator.userAgent.substring(0, 50)}...</p>
+                            <p style="font-size: 0.8em; color: #666;">Fecha actual: ${new Date().toLocaleDateString('es-ES')}</p>
+                            <p style="font-size: 0.8em; color: #666;">Eventos en memoria: ${events.length}</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            const eventsByDate = groupEventsByDate(events);
+            
+            Object.keys(eventsByDate).sort().forEach(date => {
+                const dateTitle = document.createElement('div');
+                dateTitle.style.cssText = `
+                    grid-column: 1 / -1;
+                    text-align: center;
+                    font-size: 1.8em;
+                    font-weight: bold;
+                    color: #ff6b6b;
+                    margin: 30px 0 20px 0;
+                    padding: 15px;
+                    background: white;
+                    border-radius: 15px;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                `;
+                
+                const eventDate = new Date(date + 'T00:00:00'); // Forzar formato correcto
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                const tomorrow = new Date(today);
+                tomorrow.setDate(today.getDate() + 1);
+                
+                const isToday = eventDate.toDateString() === today.toDateString();
+                const isTomorrow = eventDate.toDateString() === tomorrow.toDateString();
+                
+                let dayLabel;
+                try {
+                    dayLabel = eventDate.toLocaleDateString('es-ES', {
+                        weekday: 'long',
+                        day: 'numeric',
+                        month: 'long'
+                    });
+                } catch (e) {
+                    // Fallback si hay problemas con toLocaleDateString
+                    dayLabel = eventDate.toDateString();
+                }
+                
+                if (isToday) dayLabel = `📅 HOY - ${dayLabel}`;
+                else if (isTomorrow) dayLabel = `📅 MAÑANA - ${dayLabel}`;
+                else dayLabel = `📅 ${dayLabel}`;
+                
+                dateTitle.textContent = `${dayLabel} (${eventsByDate[date].length} eventos)`;
+                
+                container.appendChild(dateTitle);
+
+                eventsByDate[date].forEach(event => {
+                    const eventCard = createEventCard(event);
+                    container.appendChild(eventCard);
+                });
+            });
+        }
+
+        function groupEventsByDate(events) {
+            return events.reduce((groups, event) => {
+                const date = event.date;
+                if (!groups[date]) groups[date] = [];
+                groups[date].push(event);
+                return groups;
+            }, {});
+        }
+
+        function createEventCard(event) {
+            const card = document.createElement('div');
+            card.className = 'event-card';
+            
+            card.innerHTML = `
+                <div class="event-header">
+                    <div class="event-title">${event.center}</div>
+                    <div class="event-date">${formatDateShort(event.date)}</div>
+                </div>
+                <div class="event-info">
+                    <p><strong>⏰ Hora:</strong> ${event.time}</p>
+                    <p><strong>👥 Invitados:</strong> ${event.guestCount}</p>
+                    <p><strong>📄 Documentos:</strong> ${event.documents ? event.documents.length : 0}</p>
+                    ${event.observations ? `<p><strong>📝 Notas:</strong> ${event.observations}</p>` : ''}
+                </div>
+                <div class="roles-container">
+                    <div class="role-button supervisor" onclick="showDocuments(${event.id}, 'supervisor')">
+                        <span class="role-emoji">👔</span>
+                        <div class="role-name">Supervisor</div>
+                    </div>
+                    <div class="role-button supermetre" onclick="showDocuments(${event.id}, 'supermetre')">
+                        <span class="role-emoji">🎩</span>
+                        <div class="role-name">Supermetre</div>
+                    </div>
+                    <div class="role-button cocina" onclick="showDocuments(${event.id}, 'cocina')">
+                        <span class="role-emoji">👨‍🍳</span>
+                        <div class="role-name">Cocina</div>
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function showDocuments(eventId, role) {
+            const event = events.find(e => e.id === eventId);
+            if (!event) return;
+
+            const roleInfo = {
+                supervisor: { name: 'Supervisor', emoji: '👔', color: '#007bff' },
+                supermetre: { name: 'Supermetre', emoji: '🎩', color: '#28a745' },
+                cocina: { name: 'Cocina', emoji: '👨‍🍳', color: '#dc3545' }
+            };
+
+            // Filtrar documentos asignados a este rol
+            const filteredDocs = (event.documents || []).filter(doc => 
+                doc.roles && doc.roles.includes(role)
+            );
+
+            document.getElementById('modalTitle').innerHTML = 
+                `${roleInfo[role].emoji} ${roleInfo[role].name}`;
+            document.getElementById('modalSubtitle').innerHTML = 
+                `${event.center} - ${formatDate(event.date)} ${event.time}`;
+
+            const modalDocs = document.getElementById('modalDocuments');
+            modalDocs.innerHTML = '';
+
+            if (filteredDocs.length === 0) {
+                modalDocs.innerHTML = `
+                    <div class="empty-state">
+                        <div class="emoji">📄</div>
+                        <h3>No hay documentos asignados</h3>
+                        <p>No se han asignado documentos para ${roleInfo[role].name} en este evento</p>
+                    </div>
+                `;
+            } else {
+                filteredDocs.forEach(doc => {
+                    const docItem = document.createElement('div');
+                    docItem.className = 'document-item';
+                    docItem.innerHTML = `
+                        <div class="document-info">
+                            <div class="document-icon">📄</div>
+                            <div class="document-details">
+                                <h4>${doc.name}</h4>
+                                <p>Tamaño: ${(doc.size / 1024 / 1024).toFixed(2)} MB</p>
+                            </div>
+                        </div>
+                        <button class="view-btn" onclick="openDocument('${doc.url}', '${doc.name}')">
+                            👁️ Ver Documento
+                        </button>
+                    `;
+                    modalDocs.appendChild(docItem);
+                });
+            }
+
+            document.getElementById('documentsModal').classList.add('active');
+        }
+
+        function openDocument(url, name) {
+            // En móviles, abrir en nueva ventana funciona mejor
+            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                window.open(url, '_blank');
+            } else {
+                // En desktop, crear un enlace de descarga si es necesario
+                const link = document.createElement('a');
+                link.href = url;
+                link.target = '_blank';
+                link.download = name;
+                link.click();
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('documentsModal').classList.remove('active');
+        }
+
+        document.getElementById('documentsModal').onclick = function(e) {
+            if (e.target === this) closeModal();
+        }
+
+        // PANEL DE ADMINISTRACIÓN
+        function toggleAdminPanel() {
+            if (!isAuthenticated) {
+                requestAdminAccess();
+                return;
+            }
+
+            adminPanelVisible = !adminPanelVisible;
+            const panel = document.getElementById('adminPanel');
+            const toggleBtn = document.querySelector('.admin-toggle');
+            
+            if (adminPanelVisible) {
+                panel.classList.add('active');
+                toggleBtn.textContent = '❌ Cerrar Admin';
+                toggleBtn.style.background = 'rgba(220, 53, 69, 0.9)';
+                toggleBtn.style.color = 'white';
+                updateAdminEventsList();
+            } else {
+                panel.classList.remove('active');
+                toggleBtn.textContent = '🔧 Admin';
+                toggleBtn.style.background = 'rgba(255, 255, 255, 0.9)';
+                toggleBtn.style.color = '#333';
+                // Logout después de cerrar panel
+                setTimeout(() => {
+                    isAuthenticated = false;
+                }, 300000); // 5 minutos
+            }
+        }
+
+        function setupFileUpload() {
+            const fileInput = document.getElementById('fileInput');
+            const fileUploadArea = document.querySelector('.file-upload-area');
+
+            fileInput.addEventListener('change', handleFiles);
+            fileUploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                fileUploadArea.style.borderColor = '#ff6b6b';
+            });
+            fileUploadArea.addEventListener('dragleave', () => {
+                fileUploadArea.style.borderColor = '#dee2e6';
+            });
+            fileUploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                fileUploadArea.style.borderColor = '#dee2e6';
+                const files = Array.from(e.dataTransfer.files).filter(file => file.type === 'application/pdf');
+                processFiles(files);
+            });
+        }
+
+        function handleFiles(e) {
+            const files = Array.from(e.target.files);
+            processFiles(files);
+        }
+
+        function processFiles(files) {
+            // Si estamos editando, mantener documentos existentes
+            if (editingEventId) {
+                const existingEvent = events.find(e => e.id === editingEventId);
+                if (existingEvent && existingEvent.documents) {
+                    // Añadir nuevos archivos a los existentes
+                    const newFiles = files.map(file => ({
+                        file: file,
+                        name: file.name,
+                        size: file.size,
+                        url: URL.createObjectURL(file),
+                        roles: []
+                    }));
+                    currentFiles = [...currentFiles, ...newFiles];
+                } else {
+                    currentFiles = files.map(file => ({
+                        file: file,
+                        name: file.name,
+                        size: file.size,
+                        url: URL.createObjectURL(file),
+                        roles: []
+                    }));
+                }
+            } else {
+                currentFiles = files.map(file => ({
+                    file: file,
+                    name: file.name,
+                    size: file.size,
+                    url: URL.createObjectURL(file),
+                    roles: []
+                }));
+            }
+            displayDocumentAssignment();
+        }
+
+        function displayDocumentAssignment() {
+            const container = document.getElementById('documentsAssignment');
+            container.innerHTML = '';
+
+            if (currentFiles.length === 0) {
+                container.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">No hay documentos subidos aún</p>';
+                return;
+            }
+
+            currentFiles.forEach((fileData, index) => {
+                const assignmentDiv = document.createElement('div');
+                assignmentDiv.className = 'document-assignment';
+                assignmentDiv.innerHTML = `
+                    <div class="assignment-header">
+                        <div class="document-name">📄 ${fileData.name}</div>
+                        <button class="remove-file-btn" onclick="removeFileFromList(${index})">❌ Eliminar</button>
+                    </div>
+                    <div style="margin-bottom: 15px; color: #666; font-size: 0.9em;">
+                        Selecciona a qué roles debe estar disponible este documento:
+                    </div>
+                    <div class="role-checkboxes">
+                        <label class="role-checkbox supervisor">
+                            <input type="checkbox" onchange="toggleRole(${index}, 'supervisor')" ${fileData.roles.includes('supervisor') ? 'checked' : ''}>
+                            <span>👔 Supervisor</span>
+                        </label>
+                        <label class="role-checkbox supermetre">
+                            <input type="checkbox" onchange="toggleRole(${index}, 'supermetre')" ${fileData.roles.includes('supermetre') ? 'checked' : ''}>
+                            <span>🎩 Supermetre</span>
+                        </label>
+                        <label class="role-checkbox cocina">
+                            <input type="checkbox" onchange="toggleRole(${index}, 'cocina')" ${fileData.roles.includes('cocina') ? 'checked' : ''}>
+                            <span>👨‍🍳 Cocina</span>
+                        </label>
+                    </div>
+                `;
+                container.appendChild(assignmentDiv);
+            });
+        }
+
+        function toggleRole(fileIndex, role) {
+            const fileData = currentFiles[fileIndex];
+            if (fileData.roles.includes(role)) {
+                fileData.roles = fileData.roles.filter(r => r !== role);
+            } else {
+                fileData.roles.push(role);
+            }
+        }
+
+        function removeFileFromList(index) {
+            currentFiles.splice(index, 1);
+            displayDocumentAssignment();
+        }
+
+        // Funciones para editar eventos
+        function editEvent(eventId) {
+            const event = events.find(e => e.id === eventId);
+            if (!event) return;
+
+            editingEventId = eventId;
+            
+            // Mostrar indicador de modo edición
+            document.getElementById('editEventContainer').style.display = 'block';
+            
+            // Llenar formulario con datos existentes
+            document.getElementById('eventCenter').value = event.center;
+            document.getElementById('eventDate').value = event.date;
+            document.getElementById('eventTime').value = event.time;
+            document.getElementById('guestCount').value = event.guestCount;
+            document.getElementById('observations').value = event.observations || '';
+            
+            // Cargar documentos existentes
+            if (event.documents) {
+                currentFiles = event.documents.map(doc => ({
+                    name: doc.name,
+                    size: doc.size,
+                    url: doc.url,
+                    roles: doc.roles || [],
+                    isExisting: true
+                }));
+                displayDocumentAssignment();
+            } else {
+                currentFiles = [];
+                displayDocumentAssignment();
+            }
+
+            // Cambiar texto del botón
+            document.getElementById('submitBtn').textContent = '💾 Actualizar Evento';
+            
+            // Hacer scroll al formulario
+            document.getElementById('eventForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function cancelEdit() {
+            editingEventId = null;
+            document.getElementById('editEventContainer').style.display = 'none';
+            document.getElementById('submitBtn').textContent = '➕ Agregar Evento';
+            
+            // Limpiar formulario
+            document.getElementById('eventForm').reset();
+            currentFiles = [];
+            displayDocumentAssignment();
+            setDefaultDate();
+        }
+
+        // Manejar envío del formulario
+        document.getElementById('eventForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Verificar que todos los documentos tengan al menos un rol asignado
+            const unassignedFiles = currentFiles.filter(fileData => fileData.roles.length === 0);
+            
+            if (unassignedFiles.length > 0) {
+                alert(`⚠️ Los siguientes documentos no tienen roles asignados:\n\n${unassignedFiles.map(f => f.name).join('\n')}\n\nPor favor asigna al menos un rol a cada documento o elimínalo.`);
+                return;
+            }
+            
+            const eventData = {
+                center: document.getElementById('eventCenter').value,
+                date: document.getElementById('eventDate').value,
+                time: document.getElementById('eventTime').value,
+                guestCount: document.getElementById('guestCount').value,
+                observations: document.getElementById('observations').value,
+                documents: currentFiles.map(fileData => ({
+                    name: fileData.name,
+                    size: fileData.size,
+                    url: fileData.url,
+                    roles: fileData.roles
+                }))
+            };
+
+            if (editingEventId) {
+                // Actualizar evento existente
+                const eventIndex = events.findIndex(e => e.id === editingEventId);
+                events[eventIndex] = {
+                    ...events[eventIndex],
+                    ...eventData,
+                    updated: new Date().toISOString()
+                };
+                showMessage('✅ ¡Evento actualizado correctamente!');
+                cancelEdit();
+            } else {
+                // Crear nuevo evento
+                const newEvent = {
+                    id: Date.now(),
+                    ...eventData,
+                    created: new Date().toISOString()
+                };
+                events.push(newEvent);
+                showMessage('✅ ¡Evento creado correctamente!');
+                
+                // Limpiar formulario
+                this.reset();
+                currentFiles = [];
+                displayDocumentAssignment();
+                setDefaultDate();
+            }
+
+            localStorage.setItem('banquetera_events', JSON.stringify(events));
+            
+            // Actualizar vistas
+            displayEvents();
+            updateAdminInfo();
+            updateAdminEventsList();
+        });
+
+        function showMessage(message, type = 'success') {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type === 'success' ? 'success-message' : 'warning-message';
+            messageDiv.textContent = message;
+            
+            const form = document.getElementById('eventForm');
+            form.insertBefore(messageDiv, form.firstChild);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 4000);
+        }
+
+        function updateAdminInfo() {
+            // Forzar recarga desde localStorage
+            events = JSON.parse(localStorage.getItem('banquetera_events')) || [];
+            
+            document.getElementById('eventCount').textContent = events.length;
+            document.getElementById('docCount').textContent = 
+                events.reduce((total, e) => total + (e.documents ? e.documents.length : 0), 0);
+        }
+
+        function updateAdminEventsList() {
+            // Forzar recarga desde localStorage
+            events = JSON.parse(localStorage.getItem('banquetera_events')) || [];
+            
+            const container = document.getElementById('adminEventsList');
+            
+            container.innerHTML = '';
+
+            if (events.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666;">No hay eventos creados aún</p>';
+                return;
+            }
+
+            // Ordenar eventos por fecha
+            const sortedEvents = [...events].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            sortedEvents.forEach(event => {
+                const eventDiv = document.createElement('div');
+                eventDiv.className = 'admin-event-card';
+                
+                // Contar documentos por rol
+                const docsByRole = {
+                    supervisor: 0,
+                    supermetre: 0,
+                    cocina: 0
+                };
+
+                if (event.documents) {
+                    event.documents.forEach(doc => {
+                        if (doc.roles) {
+                            doc.roles.forEach(role => {
+                                docsByRole[role]++;
+                            });
+                        }
+                    });
+                }
+
+                const eventDate = new Date(event.date + 'T00:00:00'); // Forzar formato correcto
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                const isToday = eventDate.toDateString() === today.toDateString();
+                const isPast = eventDate < today;
+                
+                let dateClass = '';
+                let datePrefix = '';
+                if (isToday) {
+                    dateClass = 'color: #ff6b6b; font-weight: bold;';
+                    datePrefix = 'HOY - ';
+                } else if (isPast) {
+                    dateClass = 'color: #999;';
+                    datePrefix = 'PASADO - ';
+                }
+
+                let formattedDate;
+                try {
+                    formattedDate = formatDate(event.date);
+                } catch (e) {
+                    formattedDate = event.date;
+                }
+
+                eventDiv.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <div>
+                            <h4 style="color: #ff6b6b; margin-bottom: 5px;">${event.center}</h4>
+                            <p style="${dateClass}">📅 ${datePrefix}${formattedDate} - ⏰ ${event.time}</p>
+                            <p>👥 ${event.guestCount} invitados</p>
+                            ${event.observations ? `<p style="font-style: italic; color: #666;">💬 ${event.observations}</p>` : ''}
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 5px;">
+                            <button class="btn btn-warning" onclick="editEvent(${event.id})" style="padding: 8px 15px;">✏️ Editar</button>
+                            <button class="btn btn-danger" onclick="deleteEvent(${event.id})" style="padding: 8px 15px;">🗑️ Eliminar</button>
+                        </div>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 10px;">
+                        <h5 style="margin-bottom: 10px;">📄 Documentos por Rol:</h5>
+                        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                            <span style="background: #007bff; color: white; padding: 5px 15px; border-radius: 15px; font-size: 0.9em;">
+                                👔 Supervisor: ${docsByRole.supervisor}
+                            </span>
+                            <span style="background: #28a745; color: white; padding: 5px 15px; border-radius: 15px; font-size: 0.9em;">
+                                🎩 Supermetre: ${docsByRole.supermetre}
+                            </span>
+                            <span style="background: #dc3545; color: white; padding: 5px 15px; border-radius: 15px; font-size: 0.9em;">
+                                👨‍🍳 Cocina: ${docsByRole.cocina}
+                            </span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(eventDiv);
+            });
+        }
+
+        function deleteEvent(id) {
+            const event = events.find(e => e.id === id);
+            if (!event) return;
+            
+            if (confirm(`⚠️ ¿Eliminar el evento "${event.center}" del ${formatDate(event.date)}?\n\nSe eliminarán todos los documentos asociados.`)) {
+                events = events.filter(e => e.id !== id);
+                localStorage.setItem('banquetera_events', JSON.stringify(events));
+                
+                // Si estábamos editando este evento, cancelar edición
+                if (editingEventId === id) {
+                    cancelEdit();
+                }
+                
+                displayEvents();
+                updateAdminInfo();
+                updateAdminEventsList();
+                showMessage('✅ Evento eliminado correctamente');
+            }
+        }
+
+        function cleanOldEventsManual() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const oldEvents = events.filter(event => {
+                const eventDate = new Date(event.date);
+                return eventDate < today;
+            });
+
+            if (oldEvents.length === 0) {
+                showMessage('ℹ️ No hay eventos antiguos para limpiar', 'warning');
+                return;
+            }
+
+            if (confirm(`🧹 Se eliminarán ${oldEvents.length} eventos anteriores a hoy.\n\n¿Continuar?`)) {
+                events = events.filter(event => {
+                    const eventDate = new Date(event.date);
+                    return eventDate >= today;
+                });
+
+                localStorage.setItem('banquetera_events', JSON.stringify(events));
+                
+                displayEvents();
+                updateAdminInfo();
+                updateAdminEventsList();
+                showMessage(`✅ Se eliminaron ${oldEvents.length} eventos antiguos`);
+            }
+        }
+
+        function formatDate(dateString) {
+            try {
+                // Forzar formato correcto para evitar problemas de timezone
+                const date = new Date(dateString + 'T00:00:00');
+                return date.toLocaleDateString('es-ES', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    weekday: 'long'
+                });
+            } catch (e) {
+                // Fallback si hay problemas con el formato
+                console.log('Error formateando fecha:', dateString, e);
+                return dateString;
+            }
+        }
+
+        function formatDateShort(dateString) {
+            try {
+                const date = new Date(dateString + 'T00:00:00');
+                return date.toLocaleDateString('es-ES', {
+                    month: 'short',
+                    day: 'numeric'
+                });
+            } catch (e) {
+                console.log('Error formateando fecha corta:', dateString, e);
+                const parts = dateString.split('-');
+                return `${parts[2]}/${parts[1]}`;
+            }
+        }
+
+        // Funciones para respaldo de datos
+        function exportData() {
+            const dataStr = JSON.stringify(events, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `eventos_banquetera_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            
+            showMessage('📤 Datos exportados correctamente');
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const importedEvents = JSON.parse(e.target.result);
+                        if (confirm('⚠️ ¿Importar estos datos?\n\nEsto sobrescribirá todos los eventos actuales.')) {
+                            events = importedEvents;
+                            localStorage.setItem('banquetera_events', JSON.stringify(events));
+                            
+                            displayEvents();
+                            updateAdminInfo();
+                            updateAdminEventsList();
+                            showMessage('✅ Datos importados correctamente');
+                        }
+                    } catch (error) {
+                        alert('❌ Error al leer el archivo. Verifica que sea un archivo JSON válido.');
+                    }
+                };
+                reader.readAsText(file);
+            }
+        }
+    </script>
+</body>
+</html>
