@@ -1,1 +1,638 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Generador de Enlaces - Banquetera</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .step-container {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 25px 0;
+            border-left: 5px solid #ff6b6b;
+        }
+
+        .step-container h3 {
+            color: #ff6b6b;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+        }
+
+        .instructions {
+            background: #e3f2fd;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+            border-left: 5px solid #2196f3;
+        }
+
+        .instructions h4 {
+            color: #1976d2;
+            margin-bottom: 15px;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+            line-height: 1.6;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+        }
+
+        .file-upload-area {
+            border: 3px dashed #dee2e6;
+            border-radius: 15px;
+            padding: 50px;
+            text-align: center;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 25px 0;
+        }
+
+        .file-upload-area:hover,
+        .file-upload-area.dragover {
+            border-color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+            transform: scale(1.02);
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            display: inline-block;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #2ed573, #1e90ff);
+            color: white;
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #3742fa, #2f3542);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .result-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin: 30px 0;
+            display: none;
+            border: 3px solid #28a745;
+        }
+
+        .result-container.active {
+            display: block;
+        }
+
+        .link-display {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px solid #e9ecef;
+            font-family: monospace;
+            word-break: break-all;
+            font-size: 0.9em;
+        }
+
+        .qr-container {
+            text-align: center;
+            margin: 25px 0;
+        }
+
+        .qr-container canvas {
+            border: 3px solid #ff6b6b;
+            border-radius: 15px;
+            margin: 15px 0;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #28a745;
+            font-weight: 600;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #dc3545;
+            font-weight: 600;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #fff3e0, #ffecb3);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+            border: 2px solid #ffa726;
+        }
+
+        .highlight-box h4 {
+            color: #ef6c00;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .actions-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin: 25px 0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .content {
+                padding: 20px 15px;
+            }
+            
+            .file-upload-area {
+                padding: 30px 15px;
+            }
+            
+            .btn {
+                width: 100%;
+                margin: 8px 0;
+            }
+            
+            .actions-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔗 Generador de Enlaces</h1>
+            <p>Crea enlaces de sincronización para distribuir eventos a todo el personal</p>
+        </div>
+
+        <div class="content">
+            <div class="instructions">
+                <h4>📋 Instrucciones - Cómo Usar Este Sistema</h4>
+                <ol>
+                    <li><strong>En tu PC:</strong> Ve a tu sitio web principal y crea todos los eventos del fin de semana</li>
+                    <li><strong>En tu PC:</strong> Exporta los datos desde el Panel Administrativo (📤 Exportar Datos)</li>
+                    <li><strong>Aquí:</strong> Sube el archivo JSON que se descargó</li>
+                    <li><strong>Se genera automáticamente:</strong> Un enlace y código QR</li>
+                    <li><strong>Distribuir:</strong> Envía el enlace por WhatsApp a todo tu personal</li>
+                    <li><strong>¡Listo!</strong> Todo el personal tendrá los eventos sincronizados automáticamente</li>
+                </ol>
+            </div>
+
+            <div class="step-container">
+                <h3>🗂️ PASO 1: Exportar Datos desde tu PC</h3>
+                <div class="highlight-box">
+                    <h4>¿Dónde exportar los datos?</h4>
+                    <p><strong>URL de tu sitio principal:</strong></p>
+                    <div class="link-display">
+                        <a href="https://tintobanqueteria.github.io/eventos-matrimonios/" target="_blank">
+                            https://tintobanqueteria.github.io/eventos-matrimonios/
+                        </a>
+                    </div>
+                    <p>1. Abrir esa página en tu PC</p>
+                    <p>2. Clic en "🔧 Admin" → Contraseña: <strong>Pagoda1234</strong></p>
+                    <p>3. Buscar el botón "📤 Exportar Datos"</p>
+                    <p>4. Se descarga un archivo <strong>.json</strong></p>
+                </div>
+                <div style="text-align: center;">
+                    <a href="https://tintobanqueteria.github.io/eventos-matrimonios/" target="_blank" class="btn btn-info">
+                        🖥️ Ir a Mi Sitio Principal
+                    </a>
+                </div>
+            </div>
+
+            <div class="step-container">
+                <h3>📤 PASO 2: Subir el Archivo JSON</h3>
+                <div class="file-upload-area" onclick="document.getElementById('fileInput').click()">
+                    <div style="font-size: 4em; margin-bottom: 20px; color: #ff6b6b;">📄</div>
+                    <p style="font-size: 1.3em; font-weight: bold; margin-bottom: 10px;">Arrastra tu archivo JSON aquí</p>
+                    <p style="color: #666;">o haz clic para seleccionar el archivo que se descargó</p>
+                </div>
+                <input type="file" id="fileInput" accept=".json" style="display: none;">
+                <div id="fileStatus" style="margin-top: 20px;"></div>
+            </div>
+
+            <div id="resultContainer" class="result-container">
+                <h3 style="color: #28a745; margin-bottom: 25px; text-align: center;">
+                    🎉 ¡Enlace de Sincronización Generado!
+                </h3>
+                
+                <div class="step-container">
+                    <h3>🔗 Enlace para el Personal</h3>
+                    <div id="generatedLink" class="link-display"></div>
+                    <div class="actions-container">
+                        <button class="btn btn-success" onclick="copyLink()">📋 Copiar Enlace</button>
+                        <button class="btn btn-primary" onclick="shareLink()">📱 Compartir por WhatsApp</button>
+                    </div>
+                </div>
+
+                <div class="step-container">
+                    <h3>📱 Código QR (Alternativa)</h3>
+                    <div class="qr-container">
+                        <div id="qrCode"></div>
+                        <div class="actions-container">
+                            <button class="btn btn-primary" onclick="downloadQR()">💾 Descargar QR</button>
+                            <button class="btn btn-info" onclick="printQR()">🖨️ Imprimir QR</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <h4>📱 ¿Cómo usa el personal este enlace?</h4>
+                    <ol>
+                        <li><strong>Abrir el enlace</strong> en cualquier móvil</li>
+                        <li><strong>Confirmar</strong> cuando pregunte si cargar los eventos</li>
+                        <li><strong>¡Ya pueden usar el sistema!</strong> Todos los eventos se cargan automáticamente</li>
+                        <li><strong>Funciona offline:</strong> Después de cargar no necesitan internet</li>
+                    </ol>
+                </div>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn btn-primary" onclick="generateNew()">🔄 Generar Nuevo Enlace</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentQRCanvas = null;
+        let currentLink = '';
+        let currentEvents = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            setupFileUpload();
+        });
+
+        function setupFileUpload() {
+            const fileInput = document.getElementById('fileInput');
+            const fileUploadArea = document.querySelector('.file-upload-area');
+
+            fileInput.addEventListener('change', handleFileSelection);
+
+            fileUploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                fileUploadArea.classList.add('dragover');
+            });
+
+            fileUploadArea.addEventListener('dragleave', () => {
+                fileUploadArea.classList.remove('dragover');
+            });
+
+            fileUploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                fileUploadArea.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    processFile(files[0]);
+                }
+            });
+        }
+
+        function handleFileSelection(e) {
+            const file = e.target.files[0];
+            if (file) {
+                processFile(file);
+            }
+        }
+
+        function processFile(file) {
+            const fileStatus = document.getElementById('fileStatus');
+            
+            if (!file.name.endsWith('.json')) {
+                fileStatus.innerHTML = `
+                    <div class="error-message">
+                        ❌ Por favor selecciona un archivo .json válido exportado desde el sistema principal
+                    </div>
+                `;
+                return;
+            }
+
+            fileStatus.innerHTML = '<p>📖 Procesando archivo...</p>';
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (!Array.isArray(data)) {
+                        throw new Error('El archivo no contiene un array de eventos válido');
+                    }
+
+                    if (data.length === 0) {
+                        fileStatus.innerHTML = `
+                            <div class="error-message">
+                                ⚠️ El archivo está vacío. Asegúrate de haber creado eventos antes de exportar.
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    // Validar estructura de eventos
+                    const validEvents = data.filter(event => 
+                        event.center && event.date && event.time && event.guestCount
+                    );
+
+                    if (validEvents.length !== data.length) {
+                        console.warn('Algunos eventos tienen datos incompletos');
+                    }
+
+                    fileStatus.innerHTML = `
+                        <div class="success-message">
+                            ✅ Archivo procesado correctamente<br>
+                            <strong>${validEvents.length} eventos</strong> listos para sincronizar<br>
+                            Generando enlace de sincronización...
+                        </div>
+                    `;
+
+                    currentEvents = validEvents;
+                    generateSyncLink(validEvents);
+                    
+                } catch (error) {
+                    console.error('Error procesando archivo:', error);
+                    fileStatus.innerHTML = `
+                        <div class="error-message">
+                            ❌ Error al procesar el archivo: ${error.message}<br>
+                            Asegúrate de que sea un archivo JSON válido exportado desde el sistema.
+                        </div>
+                    `;
+                }
+            };
+
+            reader.readAsText(file);
+        }
+
+        function generateSyncLink(events) {
+            try {
+                const dataString = JSON.stringify(events);
+                const encodedData = btoa(dataString);
+                const baseUrl = 'https://tintobanqueteria.github.io/eventos-matrimonios/';
+                const fullUrl = `${baseUrl}?sync=${encodedData}`;
+
+                currentLink = fullUrl;
+
+                // Mostrar el enlace
+                document.getElementById('generatedLink').textContent = fullUrl;
+
+                // Generar código QR
+                generateQRCode(fullUrl);
+
+                // Mostrar el contenedor de resultados
+                document.getElementById('resultContainer').classList.add('active');
+
+                // Scroll hacia los resultados
+                document.getElementById('resultContainer').scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+
+                showMessage(`🎉 ¡Enlace generado exitosamente con ${events.length} eventos!`, 'success');
+
+            } catch (error) {
+                console.error('Error generando enlace:', error);
+                showMessage('❌ Error al generar el enlace. Los datos pueden ser demasiado grandes.', 'error');
+            }
+        }
+
+        function generateQRCode(url) {
+            const qrContainer = document.getElementById('qrCode');
+            qrContainer.innerHTML = '';
+
+            QRCode.toCanvas(qrContainer, url, {
+                width: 250,
+                margin: 3,
+                color: {
+                    dark: '#ff6b6b',
+                    light: '#ffffff'
+                },
+                errorCorrectionLevel: 'M'
+            }, function(error, canvas) {
+                if (error) {
+                    console.error('Error generando QR:', error);
+                    qrContainer.innerHTML = '<p>❌ Error generando código QR</p>';
+                } else {
+                    currentQRCanvas = canvas;
+                }
+            });
+        }
+
+        function copyLink() {
+            if (!currentLink) return;
+
+            // Crear elemento temporal para copiar
+            const tempInput = document.createElement('input');
+            tempInput.value = currentLink;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            tempInput.setSelectionRange(0, 99999);
+
+            try {
+                document.execCommand('copy');
+                showMessage('📋 Enlace copiado al portapapeles', 'success');
+            } catch (err) {
+                console.error('Error copiando:', err);
+                showMessage('❌ Error al copiar. Selecciona y copia manualmente el enlace.', 'error');
+            }
+
+            document.body.removeChild(tempInput);
+        }
+
+        function shareLink() {
+            if (!currentLink) return;
+
+            const message = `🍽️ *Eventos de la Semana*\n\nHola! Aquí tienes el enlace con todos los eventos de este fin de semana:\n\n${currentLink}\n\n*Instrucciones:*\n1. Abrir el enlace\n2. Confirmar cuando pregunte si cargar eventos\n3. ¡Ya puedes usar el sistema!\n\n¡Que tengas un excelente fin de semana! 🎉`;
+            
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        function downloadQR() {
+            if (!currentQRCanvas) return;
+
+            const link = document.createElement('a');
+            link.download = `eventos-qr-${new Date().toISOString().split('T')[0]}.png`;
+            link.href = currentQRCanvas.toDataURL();
+            link.click();
+
+            showMessage('💾 Código QR descargado', 'success');
+        }
+
+        function printQR() {
+            if (!currentQRCanvas) return;
+
+            const printWindow = window.open('', '_blank');
+            const eventCount = currentEvents ? currentEvents.length : 0;
+            
+            printWindow.document.write(`
+                <html>
+                    <head>
+                        <title>Código QR - Eventos Banquetera</title>
+                        <style>
+                            body { 
+                                font-family: Arial, sans-serif; 
+                                text-align: center; 
+                                padding: 40px; 
+                                background: white;
+                            }
+                            .header { 
+                                margin-bottom: 30px; 
+                                color: #333;
+                            }
+                            .qr-container { 
+                                margin: 30px 0; 
+                            }
+                            .instructions { 
+                                margin-top: 30px; 
+                                max-width: 450px; 
+                                margin: 30px auto;
+                                text-align: left;
+                                background: #f8f9fa;
+                                padding: 20px;
+                                border-radius: 10px;
+                            }
+                            @media print {
+                                body { margin: 0; padding: 20px; }
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="header">
+                            <h1>🍽️ Eventos de la Semana</h1>
+                            <h2>Código QR para Personal</h2>
+                            <p><strong>Eventos incluidos:</strong> ${eventCount}</p>
+                        </div>
+                        <div class="qr-container">
+                            <img src="${currentQRCanvas.toDataURL()}" style="max-width: 300px; border: 3px solid #ff6b6b; border-radius: 15px;">
+                        </div>
+                        <div class="instructions">
+                            <h3>📱 Instrucciones para el Personal:</h3>
+                            <ol>
+                                <li><strong>Escanear</strong> este código QR con cualquier móvil</li>
+                                <li><strong>Confirmar</strong> cuando pregunte si cargar los eventos</li>
+                                <li><strong>¡Listo!</strong> Ya pueden usar el sistema completo</li>
+                                <li><strong>Offline:</strong> Funciona sin internet después de cargar</li>
+                            </ol>
+                            <p style="margin-top: 15px;"><strong>Fecha de generación:</strong> ${new Date().toLocaleDateString('es-ES')}</p>
+                        </div>
+                        <script>
+                            window.onload = function() {
+                                setTimeout(function() {
+                                    window.print();
+                                }, 1000);
+                            }
+                        </script>
+                    </body>
+                </html>
+            `);
+        }
+
+        function generateNew() {
+            document.getElementById('resultContainer').classList.remove('active');
+            document.getElementById('fileInput').value = '';
+            document.getElementById('fileStatus').innerHTML = '';
+            currentLink = '';
+            currentQRCanvas = null;
+            currentEvents = null;
+        }
+
+        function showMessage(message, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type === 'success' ? 'success-message' : 'error-message';
+            messageDiv.textContent = message;
+            
+            const content = document.querySelector('.content');
+            content.insertBefore(messageDiv, content.firstChild);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
