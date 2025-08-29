@@ -839,12 +839,29 @@
             
             <div class="admin-tools">
                 <h3 style="margin-bottom: 15px;">⚙️ Herramientas de Gestión</h3>
-                <button class="btn btn-warning" onclick="cleanOldEventsManual()">🧹 Limpiar Eventos Antiguos</button>
-                <button class="btn btn-success" onclick="exportData()">📤 Exportar Datos</button>
-                <label class="btn btn-secondary" style="cursor: pointer;">
-                    📥 Importar Datos
-                    <input type="file" accept=".json" onchange="importData(event)" style="display: none;">
-                </label>
+                <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
+                    <button class="btn btn-warning" onclick="cleanOldEventsManual()">🧹 Limpiar Eventos Antiguos</button>
+                    <button class="btn btn-success" onclick="exportData()">📤 Exportar Datos</button>
+                    <label class="btn btn-secondary" style="cursor: pointer;">
+                        📥 Importar Datos
+                        <input type="file" accept=".json" onchange="importData(event)" style="display: none;">
+                    </label>
+                    <button class="btn btn-primary" onclick="generateShareLink()">🔗 Crear Link de Sincronización</button>
+                </div>
+                <div id="shareLink" style="margin-top: 15px; display: none; background: #e7f3ff; padding: 15px; border-radius: 10px;">
+                    <p><strong>📱 Link para Móviles:</strong></p>
+                    <input type="text" id="shareLinkInput" readonly style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; margin: 10px 0;">
+                    <div style="text-align: center;">
+                        <button class="btn btn-success" onclick="copyShareLink()">📋 Copiar Link</button>
+                        <button class="btn btn-secondary" onclick="hideShareLink()">❌ Cerrar</button>
+                    </div>
+                    <div style="margin-top: 15px; font-size: 0.9em; color: #666;">
+                        <p><strong>📱 Instrucciones:</strong></p>
+                        <p>1. Copia este link</p>
+                        <p>2. Envíalo por WhatsApp o email a los móviles</p>
+                        <p>3. Al abrirlo, los eventos se cargan automáticamente</p>
+                    </div>
+                </div>
             </div>
             
             <div style="background: white; padding: 25px; border-radius: 15px; margin-bottom: 25px;">
@@ -949,6 +966,9 @@
 
         // Inicializar
         document.addEventListener('DOMContentLoaded', function() {
+            // Verificar si hay datos en la URL (para sincronización)
+            checkForSyncData();
+            
             // Forzar recarga de eventos al inicio
             events = JSON.parse(localStorage.getItem('banquetera_events')) || [];
             console.log('Iniciando sistema con', events.length, 'eventos');
@@ -970,6 +990,95 @@
                 }
             }, 30000);
         });
+
+        // Función para verificar datos de sincronización en la URL
+        function checkForSyncData() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const syncData = urlParams.get('sync');
+            
+            if (syncData) {
+                try {
+                    const decodedData = atob(syncData);
+                    const importedEvents = JSON.parse(decodedData);
+                    
+                    if (importedEvents && importedEvents.length > 0) {
+                        // Mostrar mensaje de confirmación
+                        if (confirm(`📱 Se han detectado ${importedEvents.length} eventos para sincronizar.\n\n¿Deseas cargar estos eventos en este dispositivo?`)) {
+                            events = importedEvents;
+                            localStorage.setItem('banquetera_events', JSON.stringify(events));
+                            
+                            // Limpiar la URL para evitar recargas accidentales
+                            window.history.replaceState({}, document.title, window.location.pathname);
+                            
+                            // Mostrar mensaje de éxito
+                            setTimeout(() => {
+                                alert('✅ ¡Eventos sincronizados correctamente!\n\nYa puedes ver todos los eventos en este dispositivo.');
+                                location.reload();
+                            }, 500);
+                        } else {
+                            // Limpiar la URL si el usuario cancela
+                            window.history.replaceState({}, document.title, window.location.pathname);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error al procesar datos de sincronización:', error);
+                    alert('❌ Error al sincronizar datos. El link puede estar corrupto.');
+                }
+            }
+        }
+
+        // Función para generar link de sincronización
+        function generateShareLink() {
+            if (events.length === 0) {
+                alert('⚠️ No hay eventos para sincronizar. Crea algunos eventos primero.');
+                return;
+            }
+            
+            try {
+                const dataString = JSON.stringify(events);
+                const encodedData = btoa(dataString);
+                const currentUrl = window.location.origin + window.location.pathname;
+                const shareUrl = `${currentUrl}?sync=${encodedData}`;
+                
+                document.getElementById('shareLinkInput').value = shareUrl;
+                document.getElementById('shareLink').style.display = 'block';
+                
+                showMessage(`🔗 Link de sincronización generado con ${events.length} eventos`);
+            } catch (error) {
+                console.error('Error generando link:', error);
+                alert('❌ Error generando link. Los datos pueden ser muy grandes.');
+            }
+        }
+
+        function copyShareLink() {
+            const linkInput = document.getElementById('shareLinkInput');
+            linkInput.select();
+            linkInput.setSelectionRange(0, 99999); // Para móviles
+            
+            try {
+                document.execCommand('copy');
+                showMessage('📋 Link copiado al portapapeles');
+                
+                // También mostrar el link para copiarlo manualmente si falla
+                if (navigator.share && /Android|iPhone|iPad/i.test(navigator.userAgent)) {
+                    navigator.share({
+                        title: 'Eventos Banquetera',
+                        text: 'Link para sincronizar eventos',
+                        url: linkInput.value
+                    });
+                }
+            } catch (err) {
+                console.log('Error copiando:', err);
+                // Fallback: seleccionar texto para copia manual
+                linkInput.focus();
+                linkInput.select();
+                alert('📋 Selecciona y copia manualmente el link que aparece seleccionado');
+            }
+        }
+
+        function hideShareLink() {
+            document.getElementById('shareLink').style.display = 'none';
+        }
 
         function setupMobileOptimizations() {
             // Prevenir zoom en inputs en iOS
