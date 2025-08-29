@@ -711,7 +711,8 @@
 
     <script>
         // Estado global
-        let events = JSON.parse(localStorage.getItem('banquetera_events_drive')) || [];
+        let events = JSON.parse(localStorage.getItem('banquetera_events')) || 
+                    JSON.parse(localStorage.getItem('banquetera_events_drive')) || [];
         let adminPanelVisible = false;
         let isAuthenticated = false;
         let driveLinksCount = 0;
@@ -719,10 +720,35 @@
 
         // Inicializar
         document.addEventListener('DOMContentLoaded', function() {
+            // Migrar datos si existen en el almacenamiento antiguo
+            migrateOldData();
             displayEvents();
             updateAdminInfo();
             setupMobileOptimizations();
         });
+
+        function migrateOldData() {
+            // Verificar si hay datos en el almacenamiento antiguo
+            const oldEvents = JSON.parse(localStorage.getItem('banquetera_events')) || [];
+            const driveEvents = JSON.parse(localStorage.getItem('banquetera_events_drive')) || [];
+            
+            // Combinar todos los eventos
+            const allEvents = [...oldEvents, ...driveEvents];
+            
+            // Eliminar duplicados por ID
+            const uniqueEvents = allEvents.filter((event, index, self) => 
+                index === self.findIndex(e => e.id === event.id)
+            );
+            
+            if (uniqueEvents.length > 0) {
+                events = uniqueEvents;
+                // Guardar en el almacenamiento principal
+                localStorage.setItem('banquetera_events', JSON.stringify(events));
+                // Limpiar almacenamiento temporal si existe
+                localStorage.removeItem('banquetera_events_drive');
+                console.log(`Migrados ${uniqueEvents.length} eventos al almacenamiento unificado`);
+            }
+        }
 
         function setupMobileOptimizations() {
             if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
@@ -897,7 +923,7 @@
             };
 
             events.push(event);
-            localStorage.setItem('banquetera_events_drive', JSON.stringify(events));
+            localStorage.setItem('banquetera_events', JSON.stringify(events));
 
             showMessage('✅ ¡Evento creado correctamente con documentos de Google Drive!');
             
