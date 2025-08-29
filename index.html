@@ -399,6 +399,17 @@
             margin-bottom: 15px;
         }
 
+        /* Debug info styles */
+        .debug-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            font-size: 0.8em;
+            color: #666;
+            border-left: 4px solid #007bff;
+        }
+
         /* Estilos del panel de administración */
         .form-group {
             margin-bottom: 25px;
@@ -807,8 +818,8 @@
                 text-align: center;
             }
 
-            .stats-container p {
-                font-size: 0.95em;
+            .debug-info {
+                text-align: left;
             }
         }
     </style>
@@ -847,6 +858,7 @@
                         <input type="file" accept=".json" onchange="importData(event)" style="display: none;">
                     </label>
                     <button class="btn btn-primary" onclick="generateShareLink()">🔗 Crear Link de Sincronización</button>
+                    <button class="btn btn-warning" onclick="createDemoEvents()">🎭 Crear Eventos de Prueba</button>
                 </div>
                 <div id="shareLink" style="margin-top: 15px; display: none; background: #e7f3ff; padding: 15px; border-radius: 10px;">
                     <p><strong>📱 Link para Móviles:</strong></p>
@@ -868,6 +880,7 @@
                 <h3>📊 Resumen</h3>
                 <p><strong>Total eventos:</strong> <span id="eventCount">0</span></p>
                 <p><strong>Total documentos:</strong> <span id="docCount">0</span></p>
+                <p><strong>LocalStorage disponible:</strong> <span id="storageStatus">Verificando...</span></p>
             </div>
 
             <div id="editEventContainer" style="display: none;" class="edit-mode">
@@ -957,21 +970,72 @@
 
     <script>
         // Estado global
-        let events = JSON.parse(localStorage.getItem('banquetera_events')) || [];
+        let events = [];
         let adminPanelVisible = false;
         let currentFiles = [];
         let editingEventId = null;
         let isAuthenticated = false;
         const ADMIN_PASSWORD = 'Pagoda1234';
 
+        // Test localStorage availability
+        function isLocalStorageAvailable() {
+            try {
+                const test = 'test';
+                localStorage.setItem(test, test);
+                localStorage.removeItem(test);
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        // Safe localStorage operations
+        function safeGetFromStorage(key) {
+            try {
+                if (!isLocalStorageAvailable()) {
+                    console.warn('localStorage not available, using empty array');
+                    return [];
+                }
+                const data = localStorage.getItem(key);
+                return data ? JSON.parse(data) : [];
+            } catch (e) {
+                console.error('Error reading from localStorage:', e);
+                return [];
+            }
+        }
+
+        function safeSetToStorage(key, data) {
+            try {
+                if (!isLocalStorageAvailable()) {
+                    console.warn('localStorage not available, data will not persist');
+                    return false;
+                }
+                localStorage.setItem(key, JSON.stringify(data));
+                return true;
+            } catch (e) {
+                console.error('Error writing to localStorage:', e);
+                return false;
+            }
+        }
+
         // Inicializar
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing app...');
+            
+            // Verificar localStorage
+            const storageAvailable = isLocalStorageAvailable();
+            document.getElementById('storageStatus').textContent = storageAvailable ? 'Disponible' : 'No disponible';
+            
+            if (!storageAvailable) {
+                console.warn('localStorage not available - events will not persist');
+            }
+            
             // Verificar si hay datos en la URL (para sincronización)
             checkForSyncData();
             
-            // Forzar recarga de eventos al inicio
-            events = JSON.parse(localStorage.getItem('banquetera_events')) || [];
-            console.log('Iniciando sistema con', events.length, 'eventos');
+            // Cargar eventos
+            events = safeGetFromStorage('banquetera_events');
+            console.log('Eventos cargados:', events.length);
             
             updateWeekInfo();
             displayEvents();
@@ -980,9 +1044,14 @@
             setDefaultDate();
             setupMobileOptimizations();
             
+            // Mostrar información de debug en consola
+            console.log('Navegador:', navigator.userAgent);
+            console.log('Viewport:', window.innerWidth + 'x' + window.innerHeight);
+            console.log('localStorage disponible:', storageAvailable);
+            
             // Recargar eventos cada 30 segundos para sincronización
             setInterval(() => {
-                const newEvents = JSON.parse(localStorage.getItem('banquetera_events')) || [];
+                const newEvents = safeGetFromStorage('banquetera_events');
                 if (newEvents.length !== events.length) {
                     console.log('Detectados cambios en eventos, recargando...');
                     events = newEvents;
@@ -1003,16 +1072,16 @@
                     
                     if (importedEvents && importedEvents.length > 0) {
                         // Mostrar mensaje de confirmación
-                        if (confirm(`📱 Se han detectado ${importedEvents.length} eventos para sincronizar.\n\n¿Deseas cargar estos eventos en este dispositivo?`)) {
+                        if (confirm(`Se han detectado ${importedEvents.length} eventos para sincronizar.\n\n¿Deseas cargar estos eventos en este dispositivo?`)) {
                             events = importedEvents;
-                            localStorage.setItem('banquetera_events', JSON.stringify(events));
+                            safeSetToStorage('banquetera_events', events);
                             
                             // Limpiar la URL para evitar recargas accidentales
                             window.history.replaceState({}, document.title, window.location.pathname);
                             
                             // Mostrar mensaje de éxito
                             setTimeout(() => {
-                                alert('✅ ¡Eventos sincronizados correctamente!\n\nYa puedes ver todos los eventos en este dispositivo.');
+                                alert('Eventos sincronizados correctamente!\n\nYa puedes ver todos los eventos en este dispositivo.');
                                 location.reload();
                             }, 500);
                         } else {
@@ -1022,15 +1091,123 @@
                     }
                 } catch (error) {
                     console.error('Error al procesar datos de sincronización:', error);
-                    alert('❌ Error al sincronizar datos. El link puede estar corrupto.');
+                    alert('Error al sincronizar datos. El link puede estar corrupto.');
                 }
             }
+        }
+
+        // Función para crear eventos de prueba
+        function createDemoEvents() {
+            if (events.length > 0) {
+                if (!confirm('Ya hay eventos creados. ¿Quieres añadir eventos de prueba de todas formas?')) {
+                    return;
+                }
+            }
+
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(today.getDate() + 1);
+            const nextWeek = new Date(today);
+            nextWeek.setDate(today.getDate() + 7);
+
+            const demoEvents = [
+                {
+                    id: Date.now(),
+                    center: 'Salón Principal',
+                    date: today.toISOString().split('T')[0],
+                    time: '19:00',
+                    guestCount: '150',
+                    observations: 'Evento de prueba - vegetarianos: 10 personas',
+                    documents: [
+                        {
+                            name: 'Menu-Principal.pdf',
+                            size: 1024000,
+                            url: 'data:application/pdf;base64,JVBERi0xLjMKJcTl8uXrp/Og0MTGCjQgMCBvYmoKPDwKL0xlbmd0aCA5NDEKL0ZpbHRlciAvRmxhdGVEZWNvZGUKPj4Kc3RyZWFtCngBhVVdb9sgFH3vr+DIL5YxGAz4rd+6Tuu0aR3btElbpQQb6tI2xXbI/',
+                            roles: ['supervisor', 'supermetre', 'cocina']
+                        },
+                        {
+                            name: 'Lista-Invitados.pdf',
+                            size: 512000,
+                            url: 'data:application/pdf;base64,JVBERi0xLjMKJcTl8uXrp/Og0MTGCjQgMCBvYmoKPDwKL0xlbmd0aCA5NDEKL0ZpbHRlciAvRmxhdGVEZWNvZGUKPj4Kc3RyZWFtCngBhVVdb9sgFH3vr+DIL5YxGAz4rd+6Tuu0aR3btElbpQQb6tI2xXbI/',
+                            roles: ['supervisor', 'supermetre']
+                        },
+                        {
+                            name: 'Recetas-Especiales.pdf',
+                            size: 2048000,
+                            url: 'data:application/pdf;base64,JVBERi0xLjMKJcTl8uXrp/Og0MTGCjQgMCBvYmoKPDwKL0xlbmd0aCA5NDEKL0ZpbHRlciAvRmxhdGVEZWNvZGUKPj4Kc3RyZWFtCngBhVVdb9sgFH3vr+DIL5YxGAz4rd+6Tuu0aR3btElbpQQb6tI2xXbI/',
+                            roles: ['cocina']
+                        }
+                    ],
+                    created: new Date().toISOString()
+                },
+                {
+                    id: Date.now() + 1,
+                    center: 'Terraza Garden',
+                    date: tomorrow.toISOString().split('T')[0],
+                    time: '18:30',
+                    guestCount: '80',
+                    observations: 'Evento al aire libre - tener en cuenta el clima',
+                    documents: [
+                        {
+                            name: 'Montaje-Terraza.pdf',
+                            size: 1536000,
+                            url: 'data:application/pdf;base64,JVBERi0xLjMKJcTl8uXrp/Og0MTGCjQgMCBvYmoKPDwKL0xlbmd0aCA5NDEKL0ZpbHRlciAvRmxhdGVEZWNvZGUKPj4Kc3RyZWFtCngBhVVdb9sgFH3vr+DIL5YxGAz4rd+6Tuu0aR3btElbpQQb6tI2xXbI/',
+                            roles: ['supervisor', 'supermetre']
+                        },
+                        {
+                            name: 'Menu-Cocktail.pdf',
+                            size: 768000,
+                            url: 'data:application/pdf;base64,JVBERi0xLjMKJcTl8uXrp/Og0MTGCjQgMCBvYmoKPDwKL0xlbmd0aCA5NDEKL0ZpbHRlciAvRmxhdGVEZWNvZGUKPj4Kc3RyZWFtCngBhVVdb9sgFH3vr+DIL5YxGAz4rd+6Tuu0aR3btElbpQQb6tI2xXbI/',
+                            roles: ['cocina', 'supermetre']
+                        }
+                    ],
+                    created: new Date().toISOString()
+                },
+                {
+                    id: Date.now() + 2,
+                    center: 'Salón VIP',
+                    date: nextWeek.toISOString().split('T')[0],
+                    time: '20:00',
+                    guestCount: '200',
+                    observations: 'Evento corporativo - dress code formal',
+                    documents: [
+                        {
+                            name: 'Protocolo-Corporativo.pdf',
+                            size: 1200000,
+                            url: 'data:application/pdf;base64,JVBERi0xLjMKJcTl8uXrp/Og0MTGCjQgMCBvYmoKPDwKL0xlbmd0aCA5NDEKL0ZpbHRlciAvRmxhdGVEZWNvZGUKPj4Kc3RyZWFtCngBhVVdb9sgFH3vr+DIL5YxGAz4rd+6Tuu0aR3btElbpQQb6tI2xXbI/',
+                            roles: ['supervisor']
+                        },
+                        {
+                            name: 'Menu-Gourmet.pdf',
+                            size: 1800000,
+                            url: 'data:application/pdf;base64,JVBERi0xLjMKJcTl8uXrp/Og0MTGCjQgMCBvYmoKPDwKL0xlbmd0aCA5NDEKL0ZpbHRlciAvRmxhdGVEZWNvZGUKPj4Kc3RyZWFtCngBhVVdb9sgFH3vr+DIL5YxGAz4rd+6Tuu0aR3btElbpQQb6tI2xXbI/',
+                            roles: ['cocina', 'supervisor']
+                        },
+                        {
+                            name: 'Lista-VIP.pdf',
+                            size: 900000,
+                            url: 'data:application/pdf;base64,JVBERi0xLjMKJcTl8uXrp/Og0MTGCjQgMCBvYmoKPDwKL0xlbmd0aCA5NDEKL0ZpbHRlciAvRmxhdGVEZWNvZGUKPj4Kc3RyZWFtCngBhVVdb9sgFH3vr+DIL5YxGAz4rd+6Tuu0aR3btElbpQQb6tI2xXbI/',
+                            roles: ['supervisor', 'supermetre']
+                        }
+                    ],
+                    created: new Date().toISOString()
+                }
+            ];
+
+            // Agregar eventos de prueba a los existentes
+            events = events.concat(demoEvents);
+            safeSetToStorage('banquetera_events', events);
+
+            displayEvents();
+            updateAdminInfo();
+            updateAdminEventsList();
+            showMessage(`Se crearon ${demoEvents.length} eventos de prueba correctamente!`);
         }
 
         // Función para generar link de sincronización
         function generateShareLink() {
             if (events.length === 0) {
-                alert('⚠️ No hay eventos para sincronizar. Crea algunos eventos primero.');
+                alert('No hay eventos para sincronizar. Crea algunos eventos primero.');
                 return;
             }
             
@@ -1043,10 +1220,10 @@
                 document.getElementById('shareLinkInput').value = shareUrl;
                 document.getElementById('shareLink').style.display = 'block';
                 
-                showMessage(`🔗 Link de sincronización generado con ${events.length} eventos`);
+                showMessage(`Link de sincronización generado con ${events.length} eventos`);
             } catch (error) {
                 console.error('Error generando link:', error);
-                alert('❌ Error generando link. Los datos pueden ser muy grandes.');
+                alert('Error generando link. Los datos pueden ser muy grandes.');
             }
         }
 
@@ -1057,7 +1234,7 @@
             
             try {
                 document.execCommand('copy');
-                showMessage('📋 Link copiado al portapapeles');
+                showMessage('Link copiado al portapapeles');
                 
                 // También mostrar el link para copiarlo manualmente si falla
                 if (navigator.share && /Android|iPhone|iPad/i.test(navigator.userAgent)) {
@@ -1072,7 +1249,7 @@
                 // Fallback: seleccionar texto para copia manual
                 linkInput.focus();
                 linkInput.select();
-                alert('📋 Selecciona y copia manualmente el link que aparece seleccionado');
+                alert('Selecciona y copia manualmente el link que aparece seleccionado');
             }
         }
 
@@ -1112,7 +1289,7 @@
                 isAuthenticated = true;
                 closePasswordModal();
                 toggleAdminPanel();
-                showMessage('🎉 ¡Acceso autorizado! Bienvenido al panel administrativo');
+                showMessage('Acceso autorizado! Bienvenido al panel administrativo');
             } else {
                 document.getElementById('passwordError').style.display = 'block';
                 document.getElementById('passwordInput').value = '';
@@ -1127,11 +1304,14 @@
 
         // Permitir envío con Enter en el campo de contraseña
         document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('passwordInput').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    checkPassword();
-                }
-            });
+            const passwordInput = document.getElementById('passwordInput');
+            if (passwordInput) {
+                passwordInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        checkPassword();
+                    }
+                });
+            }
         });
 
         // Cerrar modal de contraseña con Escape
@@ -1143,21 +1323,28 @@
 
         function setDefaultDate() {
             const today = new Date();
-            document.getElementById('eventDate').value = today.toISOString().split('T')[0];
+            const dateInput = document.getElementById('eventDate');
+            if (dateInput) {
+                dateInput.value = today.toISOString().split('T')[0];
+            }
         }
 
         function updateWeekInfo() {
-            document.getElementById('currentWeek').textContent = 'Eventos Disponibles';
-            document.getElementById('weekDates').textContent = 'Mostrando todos los eventos activos';
+            const weekTitle = document.getElementById('currentWeek');
+            const weekDates = document.getElementById('weekDates');
+            
+            if (weekTitle) weekTitle.textContent = 'Eventos Disponibles';
+            if (weekDates) weekDates.textContent = 'Mostrando todos los eventos activos';
         }
 
         function displayEvents() {
             const container = document.getElementById('eventsContainer');
+            if (!container) return;
             
             // Forzar recarga de eventos desde localStorage
-            events = JSON.parse(localStorage.getItem('banquetera_events')) || [];
+            events = safeGetFromStorage('banquetera_events');
             
-            console.log('Eventos cargados:', events.length); // Para debug
+            console.log('Mostrando eventos:', events.length);
             
             container.innerHTML = '';
 
@@ -1170,11 +1357,13 @@
                         <p style="margin-top: 15px; font-size: 0.9em; color: #999;">
                             💡 <strong>Tip:</strong> Abre el panel administrativo para crear eventos de prueba
                         </p>
-                        <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 10px; text-align: left;">
-                            <p style="font-size: 0.8em; color: #666;"><strong>Debug Info:</strong></p>
-                            <p style="font-size: 0.8em; color: #666;">Navegador: ${navigator.userAgent.substring(0, 50)}...</p>
-                            <p style="font-size: 0.8em; color: #666;">Fecha actual: ${new Date().toLocaleDateString('es-ES')}</p>
-                            <p style="font-size: 0.8em; color: #666;">Eventos en memoria: ${events.length}</p>
+                        <div class="debug-info">
+                            <p><strong>Información de Debug:</strong></p>
+                            <p>Navegador: ${navigator.userAgent.substring(0, 50)}...</p>
+                            <p>Fecha actual: ${new Date().toLocaleDateString('es-ES')}</p>
+                            <p>Eventos en memoria: ${events.length}</p>
+                            <p>LocalStorage: ${isLocalStorageAvailable() ? 'Disponible' : 'No disponible'}</p>
+                            <p>Viewport: ${window.innerWidth}x${window.innerHeight}</p>
                         </div>
                     </div>
                 `;
@@ -1198,7 +1387,7 @@
                     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
                 `;
                 
-                const eventDate = new Date(date + 'T00:00:00'); // Forzar formato correcto
+                const eventDate = parseEventDate(date);
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
                 
@@ -1220,9 +1409,9 @@
                     dayLabel = eventDate.toDateString();
                 }
                 
-                if (isToday) dayLabel = `📅 HOY - ${dayLabel}`;
-                else if (isTomorrow) dayLabel = `📅 MAÑANA - ${dayLabel}`;
-                else dayLabel = `📅 ${dayLabel}`;
+                if (isToday) dayLabel = `HOY - ${dayLabel}`;
+                else if (isTomorrow) dayLabel = `MAÑANA - ${dayLabel}`;
+                else dayLabel = dayLabel;
                 
                 dateTitle.textContent = `${dayLabel} (${eventsByDate[date].length} eventos)`;
                 
@@ -1233,6 +1422,12 @@
                     container.appendChild(eventCard);
                 });
             });
+        }
+
+        function parseEventDate(dateString) {
+            // Crear fecha de manera segura evitando problemas de timezone
+            const parts = dateString.split('-');
+            return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
         }
 
         function groupEventsByDate(events) {
@@ -1387,20 +1582,25 @@
             const fileInput = document.getElementById('fileInput');
             const fileUploadArea = document.querySelector('.file-upload-area');
 
-            fileInput.addEventListener('change', handleFiles);
-            fileUploadArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                fileUploadArea.style.borderColor = '#ff6b6b';
-            });
-            fileUploadArea.addEventListener('dragleave', () => {
-                fileUploadArea.style.borderColor = '#dee2e6';
-            });
-            fileUploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                fileUploadArea.style.borderColor = '#dee2e6';
-                const files = Array.from(e.dataTransfer.files).filter(file => file.type === 'application/pdf');
-                processFiles(files);
-            });
+            if (fileInput) {
+                fileInput.addEventListener('change', handleFiles);
+            }
+            
+            if (fileUploadArea) {
+                fileUploadArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    fileUploadArea.style.borderColor = '#ff6b6b';
+                });
+                fileUploadArea.addEventListener('dragleave', () => {
+                    fileUploadArea.style.borderColor = '#dee2e6';
+                });
+                fileUploadArea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    fileUploadArea.style.borderColor = '#dee2e6';
+                    const files = Array.from(e.dataTransfer.files).filter(file => file.type === 'application/pdf');
+                    processFiles(files);
+                });
+            }
         }
 
         function handleFiles(e) {
@@ -1445,6 +1645,8 @@
 
         function displayDocumentAssignment() {
             const container = document.getElementById('documentsAssignment');
+            if (!container) return;
+            
             container.innerHTML = '';
 
             if (currentFiles.length === 0) {
@@ -1541,71 +1743,77 @@
             document.getElementById('submitBtn').textContent = '➕ Agregar Evento';
             
             // Limpiar formulario
-            document.getElementById('eventForm').reset();
+            const form = document.getElementById('eventForm');
+            if (form) form.reset();
             currentFiles = [];
             displayDocumentAssignment();
             setDefaultDate();
         }
 
         // Manejar envío del formulario
-        document.getElementById('eventForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Verificar que todos los documentos tengan al menos un rol asignado
-            const unassignedFiles = currentFiles.filter(fileData => fileData.roles.length === 0);
-            
-            if (unassignedFiles.length > 0) {
-                alert(`⚠️ Los siguientes documentos no tienen roles asignados:\n\n${unassignedFiles.map(f => f.name).join('\n')}\n\nPor favor asigna al menos un rol a cada documento o elimínalo.`);
-                return;
-            }
-            
-            const eventData = {
-                center: document.getElementById('eventCenter').value,
-                date: document.getElementById('eventDate').value,
-                time: document.getElementById('eventTime').value,
-                guestCount: document.getElementById('guestCount').value,
-                observations: document.getElementById('observations').value,
-                documents: currentFiles.map(fileData => ({
-                    name: fileData.name,
-                    size: fileData.size,
-                    url: fileData.url,
-                    roles: fileData.roles
-                }))
-            };
+        document.addEventListener('DOMContentLoaded', function() {
+            const eventForm = document.getElementById('eventForm');
+            if (eventForm) {
+                eventForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    // Verificar que todos los documentos tengan al menos un rol asignado
+                    const unassignedFiles = currentFiles.filter(fileData => fileData.roles.length === 0);
+                    
+                    if (unassignedFiles.length > 0) {
+                        alert(`Los siguientes documentos no tienen roles asignados:\n\n${unassignedFiles.map(f => f.name).join('\n')}\n\nPor favor asigna al menos un rol a cada documento o elimínalo.`);
+                        return;
+                    }
+                    
+                    const eventData = {
+                        center: document.getElementById('eventCenter').value,
+                        date: document.getElementById('eventDate').value,
+                        time: document.getElementById('eventTime').value,
+                        guestCount: document.getElementById('guestCount').value,
+                        observations: document.getElementById('observations').value,
+                        documents: currentFiles.map(fileData => ({
+                            name: fileData.name,
+                            size: fileData.size,
+                            url: fileData.url,
+                            roles: fileData.roles
+                        }))
+                    };
 
-            if (editingEventId) {
-                // Actualizar evento existente
-                const eventIndex = events.findIndex(e => e.id === editingEventId);
-                events[eventIndex] = {
-                    ...events[eventIndex],
-                    ...eventData,
-                    updated: new Date().toISOString()
-                };
-                showMessage('✅ ¡Evento actualizado correctamente!');
-                cancelEdit();
-            } else {
-                // Crear nuevo evento
-                const newEvent = {
-                    id: Date.now(),
-                    ...eventData,
-                    created: new Date().toISOString()
-                };
-                events.push(newEvent);
-                showMessage('✅ ¡Evento creado correctamente!');
-                
-                // Limpiar formulario
-                this.reset();
-                currentFiles = [];
-                displayDocumentAssignment();
-                setDefaultDate();
-            }
+                    if (editingEventId) {
+                        // Actualizar evento existente
+                        const eventIndex = events.findIndex(e => e.id === editingEventId);
+                        events[eventIndex] = {
+                            ...events[eventIndex],
+                            ...eventData,
+                            updated: new Date().toISOString()
+                        };
+                        showMessage('Evento actualizado correctamente!');
+                        cancelEdit();
+                    } else {
+                        // Crear nuevo evento
+                        const newEvent = {
+                            id: Date.now(),
+                            ...eventData,
+                            created: new Date().toISOString()
+                        };
+                        events.push(newEvent);
+                        showMessage('Evento creado correctamente!');
+                        
+                        // Limpiar formulario
+                        this.reset();
+                        currentFiles = [];
+                        displayDocumentAssignment();
+                        setDefaultDate();
+                    }
 
-            localStorage.setItem('banquetera_events', JSON.stringify(events));
-            
-            // Actualizar vistas
-            displayEvents();
-            updateAdminInfo();
-            updateAdminEventsList();
+                    safeSetToStorage('banquetera_events', events);
+                    
+                    // Actualizar vistas
+                    displayEvents();
+                    updateAdminInfo();
+                    updateAdminEventsList();
+                });
+            }
         });
 
         function showMessage(message, type = 'success') {
@@ -1614,27 +1822,34 @@
             messageDiv.textContent = message;
             
             const form = document.getElementById('eventForm');
-            form.insertBefore(messageDiv, form.firstChild);
-            
-            setTimeout(() => {
-                messageDiv.remove();
-            }, 4000);
+            if (form) {
+                form.insertBefore(messageDiv, form.firstChild);
+                
+                setTimeout(() => {
+                    messageDiv.remove();
+                }, 4000);
+            }
         }
 
         function updateAdminInfo() {
             // Forzar recarga desde localStorage
-            events = JSON.parse(localStorage.getItem('banquetera_events')) || [];
+            events = safeGetFromStorage('banquetera_events');
             
-            document.getElementById('eventCount').textContent = events.length;
-            document.getElementById('docCount').textContent = 
-                events.reduce((total, e) => total + (e.documents ? e.documents.length : 0), 0);
+            const eventCount = document.getElementById('eventCount');
+            const docCount = document.getElementById('docCount');
+            
+            if (eventCount) eventCount.textContent = events.length;
+            if (docCount) {
+                docCount.textContent = events.reduce((total, e) => total + (e.documents ? e.documents.length : 0), 0);
+            }
         }
 
         function updateAdminEventsList() {
             // Forzar recarga desde localStorage
-            events = JSON.parse(localStorage.getItem('banquetera_events')) || [];
+            events = safeGetFromStorage('banquetera_events');
             
             const container = document.getElementById('adminEventsList');
+            if (!container) return;
             
             container.innerHTML = '';
 
@@ -1667,7 +1882,7 @@
                     });
                 }
 
-                const eventDate = new Date(event.date + 'T00:00:00'); // Forzar formato correcto
+                const eventDate = parseEventDate(event.date);
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
                 
@@ -1727,9 +1942,9 @@
             const event = events.find(e => e.id === id);
             if (!event) return;
             
-            if (confirm(`⚠️ ¿Eliminar el evento "${event.center}" del ${formatDate(event.date)}?\n\nSe eliminarán todos los documentos asociados.`)) {
+            if (confirm(`¿Eliminar el evento "${event.center}" del ${formatDate(event.date)}?\n\nSe eliminarán todos los documentos asociados.`)) {
                 events = events.filter(e => e.id !== id);
-                localStorage.setItem('banquetera_events', JSON.stringify(events));
+                safeSetToStorage('banquetera_events', events);
                 
                 // Si estábamos editando este evento, cancelar edición
                 if (editingEventId === id) {
@@ -1739,7 +1954,7 @@
                 displayEvents();
                 updateAdminInfo();
                 updateAdminEventsList();
-                showMessage('✅ Evento eliminado correctamente');
+                showMessage('Evento eliminado correctamente');
             }
         }
 
@@ -1748,34 +1963,33 @@
             today.setHours(0, 0, 0, 0);
             
             const oldEvents = events.filter(event => {
-                const eventDate = new Date(event.date);
+                const eventDate = parseEventDate(event.date);
                 return eventDate < today;
             });
 
             if (oldEvents.length === 0) {
-                showMessage('ℹ️ No hay eventos antiguos para limpiar', 'warning');
+                showMessage('No hay eventos antiguos para limpiar', 'warning');
                 return;
             }
 
-            if (confirm(`🧹 Se eliminarán ${oldEvents.length} eventos anteriores a hoy.\n\n¿Continuar?`)) {
+            if (confirm(`Se eliminarán ${oldEvents.length} eventos anteriores a hoy.\n\n¿Continuar?`)) {
                 events = events.filter(event => {
-                    const eventDate = new Date(event.date);
+                    const eventDate = parseEventDate(event.date);
                     return eventDate >= today;
                 });
 
-                localStorage.setItem('banquetera_events', JSON.stringify(events));
+                safeSetToStorage('banquetera_events', events);
                 
                 displayEvents();
                 updateAdminInfo();
                 updateAdminEventsList();
-                showMessage(`✅ Se eliminaron ${oldEvents.length} eventos antiguos`);
+                showMessage(`Se eliminaron ${oldEvents.length} eventos antiguos`);
             }
         }
 
         function formatDate(dateString) {
             try {
-                // Forzar formato correcto para evitar problemas de timezone
-                const date = new Date(dateString + 'T00:00:00');
+                const date = parseEventDate(dateString);
                 return date.toLocaleDateString('es-ES', {
                     year: 'numeric',
                     month: 'long',
@@ -1783,7 +1997,6 @@
                     weekday: 'long'
                 });
             } catch (e) {
-                // Fallback si hay problemas con el formato
                 console.log('Error formateando fecha:', dateString, e);
                 return dateString;
             }
@@ -1791,7 +2004,7 @@
 
         function formatDateShort(dateString) {
             try {
-                const date = new Date(dateString + 'T00:00:00');
+                const date = parseEventDate(dateString);
                 return date.toLocaleDateString('es-ES', {
                     month: 'short',
                     day: 'numeric'
@@ -1813,7 +2026,7 @@
             link.download = `eventos_banquetera_${new Date().toISOString().split('T')[0]}.json`;
             link.click();
             
-            showMessage('📤 Datos exportados correctamente');
+            showMessage('Datos exportados correctamente');
         }
 
         function importData(event) {
@@ -1823,17 +2036,17 @@
                 reader.onload = function(e) {
                     try {
                         const importedEvents = JSON.parse(e.target.result);
-                        if (confirm('⚠️ ¿Importar estos datos?\n\nEsto sobrescribirá todos los eventos actuales.')) {
+                        if (confirm('¿Importar estos datos?\n\nEsto sobrescribirá todos los eventos actuales.')) {
                             events = importedEvents;
-                            localStorage.setItem('banquetera_events', JSON.stringify(events));
+                            safeSetToStorage('banquetera_events', events);
                             
                             displayEvents();
                             updateAdminInfo();
                             updateAdminEventsList();
-                            showMessage('✅ Datos importados correctamente');
+                            showMessage('Datos importados correctamente');
                         }
                     } catch (error) {
-                        alert('❌ Error al leer el archivo. Verifica que sea un archivo JSON válido.');
+                        alert('Error al leer el archivo. Verifica que sea un archivo JSON válido.');
                     }
                 };
                 reader.readAsText(file);
