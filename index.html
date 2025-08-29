@@ -377,6 +377,13 @@
             border: 2px solid #e9ecef;
             border-radius: 10px;
             font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #ff6b6b;
         }
 
         .btn {
@@ -387,6 +394,8 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
         }
 
         .btn-primary {
@@ -402,6 +411,20 @@
         .btn-success {
             background: linear-gradient(135deg, #2ed573, #1e90ff);
             color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ffa502, #ff6b35);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d, #495057);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
         }
 
         .file-upload-area {
@@ -428,6 +451,15 @@
             border-left: 5px solid #28a745;
         }
 
+        .warning-message {
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 5px solid #ffc107;
+        }
+
         .events-admin {
             margin-top: 30px;
         }
@@ -438,6 +470,14 @@
             border-radius: 15px;
             padding: 20px;
             margin-bottom: 20px;
+        }
+
+        .admin-tools {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border: 2px solid #e9ecef;
         }
 
         /* Nuevos estilos para asignación manual de documentos */
@@ -492,9 +532,8 @@
             color: #007bff;
         }
 
-        .role-checkbox.supervisor input:checked + span {
-            background: #007bff;
-            color: white;
+        .role-checkbox.supervisor input:checked {
+            accent-color: #007bff;
         }
 
         .role-checkbox.supermetre {
@@ -502,9 +541,8 @@
             color: #28a745;
         }
 
-        .role-checkbox.supermetre input:checked + span {
-            background: #28a745;
-            color: white;
+        .role-checkbox.supermetre input:checked {
+            accent-color: #28a745;
         }
 
         .role-checkbox.cocina {
@@ -512,9 +550,8 @@
             color: #dc3545;
         }
 
-        .role-checkbox.cocina input:checked + span {
-            background: #dc3545;
-            color: white;
+        .role-checkbox.cocina input:checked {
+            accent-color: #dc3545;
         }
 
         .remove-file-btn {
@@ -525,6 +562,15 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 0.8em;
+        }
+
+        .edit-mode {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+        }
+
+        .edit-mode .modal-title {
+            color: #856404;
         }
 
         @media (max-width: 768px) {
@@ -553,6 +599,10 @@
                 align-items: stretch;
                 gap: 10px;
             }
+
+            .btn {
+                margin-right: 5px;
+            }
         }
     </style>
 </head>
@@ -564,16 +614,31 @@
         <div id="adminPanel" class="admin-panel">
             <h2 style="color: #ff6b6b; margin-bottom: 25px;">🔧 Panel de Administración</h2>
             
+            <div class="admin-tools">
+                <h3 style="margin-bottom: 15px;">⚙️ Herramientas de Gestión</h3>
+                <button class="btn btn-warning" onclick="cleanOldEventsManual()">🧹 Limpiar Eventos Antiguos</button>
+                <button class="btn btn-success" onclick="exportData()">📤 Exportar Datos</button>
+                <label class="btn btn-secondary" style="cursor: pointer;">
+                    📥 Importar Datos
+                    <input type="file" accept=".json" onchange="importData(event)" style="display: none;">
+                </label>
+            </div>
+            
             <div style="background: white; padding: 25px; border-radius: 15px; margin-bottom: 25px;">
                 <h3>📊 Resumen</h3>
-                <p><strong>Eventos esta semana:</strong> <span id="eventCount">0</span></p>
+                <p><strong>Total eventos:</strong> <span id="eventCount">0</span></p>
                 <p><strong>Total documentos:</strong> <span id="docCount">0</span></p>
+            </div>
+
+            <div id="editEventContainer" style="display: none;" class="edit-mode">
+                <h3 style="color: #856404; margin-bottom: 20px;">✏️ Editando Evento</h3>
+                <button class="btn btn-secondary" onclick="cancelEdit()">❌ Cancelar Edición</button>
             </div>
 
             <form id="eventForm">
                 <div class="form-group">
                     <label for="eventCenter">🏛️ Centro de Eventos</label>
-                    <input type="text" id="eventCenter" placeholder="Ej: Salón Principal, Terraza Garden, etc." required>
+                    <input type="text" id="eventCenter" placeholder="Escribe el nombre del centro: Ej. Salón Principal, Terraza Garden, etc." required>
                 </div>
 
                 <div class="form-group">
@@ -609,11 +674,11 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary">➕ Agregar Evento</button>
+                <button type="submit" class="btn btn-primary" id="submitBtn">➕ Agregar Evento</button>
             </form>
 
             <div class="events-admin">
-                <h3>📋 Eventos de Esta Semana</h3>
+                <h3>📋 Todos los Eventos</h3>
                 <div id="adminEventsList"></div>
             </div>
         </div>
@@ -626,8 +691,8 @@
 
         <div class="main-content">
             <div class="week-info">
-                <h2 id="currentWeek">Semana del ...</h2>
-                <div class="week-dates" id="weekDates">...</div>
+                <h2 id="currentWeek">Eventos Disponibles</h2>
+                <div class="week-dates" id="weekDates">Mostrando todos los eventos activos</div>
             </div>
 
             <div id="eventsContainer" class="events-grid">
@@ -655,6 +720,7 @@
         let events = JSON.parse(localStorage.getItem('banquetera_events')) || [];
         let adminPanelVisible = false;
         let currentFiles = [];
+        let editingEventId = null;
 
         // Inicializar
         document.addEventListener('DOMContentLoaded', function() {
@@ -671,41 +737,30 @@
         }
 
         function updateWeekInfo() {
-            const today = new Date();
-            const saturday = new Date(today);
-            saturday.setDate(today.getDate() + (6 - today.getDay()));
-            
-            const sunday = new Date(saturday);
-            sunday.setDate(saturday.getDate() + 1);
-            
-            document.getElementById('currentWeek').textContent = 
-                `Fin de Semana del ${saturday.toLocaleDateString('es-ES')} - ${sunday.toLocaleDateString('es-ES')}`;
-            
-            document.getElementById('weekDates').textContent = 
-                `${saturday.toLocaleDateString('es-ES', {weekday: 'long', day: 'numeric', month: 'long'})} y ${sunday.toLocaleDateString('es-ES', {weekday: 'long', day: 'numeric', month: 'long'})}`;
+            document.getElementById('currentWeek').textContent = 'Eventos Disponibles';
+            document.getElementById('weekDates').textContent = 'Mostrando todos los eventos activos';
         }
 
         function displayEvents() {
             const container = document.getElementById('eventsContainer');
-            const relevantEvents = getCurrentWeekEvents();
             
             container.innerHTML = '';
 
-            if (relevantEvents.length === 0) {
+            if (events.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
                         <div class="emoji">📅</div>
                         <h3>No hay eventos programados</h3>
-                        <p>Los eventos para este fin de semana aparecerán aquí cuando sean cargados</p>
+                        <p>Los eventos aparecerán aquí cuando sean cargados desde el panel administrativo</p>
                         <p style="margin-top: 15px; font-size: 0.9em; color: #999;">
-                            💡 <strong>Tip:</strong> Para probar el sistema, crea eventos con fechas de hoy, mañana o cualquier día
+                            💡 <strong>Tip:</strong> Abre el panel administrativo para crear eventos de prueba
                         </p>
                     </div>
                 `;
                 return;
             }
 
-            const eventsByDate = groupEventsByDate(relevantEvents);
+            const eventsByDate = groupEventsByDate(events);
             
             Object.keys(eventsByDate).sort().forEach(date => {
                 const dateTitle = document.createElement('div');
@@ -742,21 +797,6 @@
                     const eventCard = createEventCard(event);
                     container.appendChild(eventCard);
                 });
-            });
-        }
-
-        function getThisWeekendEvents() {
-            const today = new Date();
-            const saturday = new Date(today);
-            saturday.setDate(today.getDate() + (6 - today.getDay()));
-            
-            const sunday = new Date(saturday);
-            sunday.setDate(saturday.getDate() + 1);
-            
-            return events.filter(event => {
-                const eventDate = new Date(event.date);
-                return (eventDate.toDateString() === saturday.toDateString() || 
-                        eventDate.toDateString() === sunday.toDateString());
             });
         }
 
@@ -903,13 +943,37 @@
         }
 
         function processFiles(files) {
-            currentFiles = files.map(file => ({
-                file: file,
-                name: file.name,
-                size: file.size,
-                url: URL.createObjectURL(file),
-                roles: [] // Array para almacenar los roles asignados
-            }));
+            // Si estamos editando, mantener documentos existentes
+            if (editingEventId) {
+                const existingEvent = events.find(e => e.id === editingEventId);
+                if (existingEvent && existingEvent.documents) {
+                    // Añadir nuevos archivos a los existentes
+                    const newFiles = files.map(file => ({
+                        file: file,
+                        name: file.name,
+                        size: file.size,
+                        url: URL.createObjectURL(file),
+                        roles: []
+                    }));
+                    currentFiles = [...currentFiles, ...newFiles];
+                } else {
+                    currentFiles = files.map(file => ({
+                        file: file,
+                        name: file.name,
+                        size: file.size,
+                        url: URL.createObjectURL(file),
+                        roles: []
+                    }));
+                }
+            } else {
+                currentFiles = files.map(file => ({
+                    file: file,
+                    name: file.name,
+                    size: file.size,
+                    url: URL.createObjectURL(file),
+                    roles: []
+                }));
+            }
             displayDocumentAssignment();
         }
 
@@ -966,6 +1030,57 @@
             displayDocumentAssignment();
         }
 
+        // Funciones para editar eventos
+        function editEvent(eventId) {
+            const event = events.find(e => e.id === eventId);
+            if (!event) return;
+
+            editingEventId = eventId;
+            
+            // Mostrar indicador de modo edición
+            document.getElementById('editEventContainer').style.display = 'block';
+            
+            // Llenar formulario con datos existentes
+            document.getElementById('eventCenter').value = event.center;
+            document.getElementById('eventDate').value = event.date;
+            document.getElementById('eventTime').value = event.time;
+            document.getElementById('guestCount').value = event.guestCount;
+            document.getElementById('observations').value = event.observations || '';
+            
+            // Cargar documentos existentes
+            if (event.documents) {
+                currentFiles = event.documents.map(doc => ({
+                    name: doc.name,
+                    size: doc.size,
+                    url: doc.url,
+                    roles: doc.roles || [],
+                    isExisting: true
+                }));
+                displayDocumentAssignment();
+            } else {
+                currentFiles = [];
+                displayDocumentAssignment();
+            }
+
+            // Cambiar texto del botón
+            document.getElementById('submitBtn').textContent = '💾 Actualizar Evento';
+            
+            // Hacer scroll al formulario
+            document.getElementById('eventForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function cancelEdit() {
+            editingEventId = null;
+            document.getElementById('editEventContainer').style.display = 'none';
+            document.getElementById('submitBtn').textContent = '➕ Agregar Evento';
+            
+            // Limpiar formulario
+            document.getElementById('eventForm').reset();
+            currentFiles = [];
+            displayDocumentAssignment();
+            setDefaultDate();
+        }
+
         // Manejar envío del formulario
         document.getElementById('eventForm').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -978,8 +1093,7 @@
                 return;
             }
             
-            const event = {
-                id: Date.now(),
+            const eventData = {
                 center: document.getElementById('eventCenter').value,
                 date: document.getElementById('eventDate').value,
                 time: document.getElementById('eventTime').value,
@@ -990,20 +1104,37 @@
                     size: fileData.size,
                     url: fileData.url,
                     roles: fileData.roles
-                })),
-                created: new Date().toISOString()
+                }))
             };
 
-            events.push(event);
-            localStorage.setItem('banquetera_events', JSON.stringify(events));
+            if (editingEventId) {
+                // Actualizar evento existente
+                const eventIndex = events.findIndex(e => e.id === editingEventId);
+                events[eventIndex] = {
+                    ...events[eventIndex],
+                    ...eventData,
+                    updated: new Date().toISOString()
+                };
+                showMessage('✅ ¡Evento actualizado correctamente!');
+                cancelEdit();
+            } else {
+                // Crear nuevo evento
+                const newEvent = {
+                    id: Date.now(),
+                    ...eventData,
+                    created: new Date().toISOString()
+                };
+                events.push(newEvent);
+                showMessage('✅ ¡Evento creado correctamente!');
+                
+                // Limpiar formulario
+                this.reset();
+                currentFiles = [];
+                displayDocumentAssignment();
+                setDefaultDate();
+            }
 
-            showMessage('✅ ¡Evento agregado correctamente con documentos asignados por rol!');
-            
-            // Limpiar formulario
-            this.reset();
-            currentFiles = [];
-            displayDocumentAssignment();
-            setDefaultDate();
+            localStorage.setItem('banquetera_events', JSON.stringify(events));
             
             // Actualizar vistas
             displayEvents();
@@ -1011,9 +1142,9 @@
             updateAdminEventsList();
         });
 
-        function showMessage(message) {
+        function showMessage(message, type = 'success') {
             const messageDiv = document.createElement('div');
-            messageDiv.className = 'success-message';
+            messageDiv.className = type === 'success' ? 'success-message' : 'warning-message';
             messageDiv.textContent = message;
             
             const form = document.getElementById('eventForm');
@@ -1025,24 +1156,25 @@
         }
 
         function updateAdminInfo() {
-            const relevantEvents = getCurrentWeekEvents();
-            document.getElementById('eventCount').textContent = relevantEvents.length;
+            document.getElementById('eventCount').textContent = events.length;
             document.getElementById('docCount').textContent = 
-                relevantEvents.reduce((total, e) => total + (e.documents ? e.documents.length : 0), 0);
+                events.reduce((total, e) => total + (e.documents ? e.documents.length : 0), 0);
         }
 
         function updateAdminEventsList() {
             const container = document.getElementById('adminEventsList');
-            const relevantEvents = getCurrentWeekEvents();
             
             container.innerHTML = '';
 
-            if (relevantEvents.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: #666;">No hay eventos en el rango de fechas actual</p>';
+            if (events.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666;">No hay eventos creados aún</p>';
                 return;
             }
 
-            relevantEvents.forEach(event => {
+            // Ordenar eventos por fecha
+            const sortedEvents = [...events].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            sortedEvents.forEach(event => {
                 const eventDiv = document.createElement('div');
                 eventDiv.className = 'admin-event-card';
                 
@@ -1063,18 +1195,36 @@
                     });
                 }
 
+                const eventDate = new Date(event.date);
+                const isToday = eventDate.toDateString() === new Date().toDateString();
+                const isPast = eventDate < new Date();
+                
+                let dateClass = '';
+                let datePrefix = '';
+                if (isToday) {
+                    dateClass = 'color: #ff6b6b; font-weight: bold;';
+                    datePrefix = 'HOY - ';
+                } else if (isPast) {
+                    dateClass = 'color: #999;';
+                    datePrefix = 'PASADO - ';
+                }
+
                 eventDiv.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                         <div>
                             <h4 style="color: #ff6b6b; margin-bottom: 5px;">${event.center}</h4>
-                            <p>📅 ${formatDate(event.date)} - ⏰ ${event.time}</p>
+                            <p style="${dateClass}">📅 ${datePrefix}${formatDate(event.date)} - ⏰ ${event.time}</p>
                             <p>👥 ${event.guestCount} invitados</p>
+                            ${event.observations ? `<p style="font-style: italic; color: #666;">💬 ${event.observations}</p>` : ''}
                         </div>
-                        <button class="btn btn-danger" onclick="deleteEvent(${event.id})">🗑️ Eliminar</button>
+                        <div style="display: flex; flex-direction: column; gap: 5px;">
+                            <button class="btn btn-warning" onclick="editEvent(${event.id})" style="padding: 8px 15px;">✏️ Editar</button>
+                            <button class="btn btn-danger" onclick="deleteEvent(${event.id})" style="padding: 8px 15px;">🗑️ Eliminar</button>
+                        </div>
                     </div>
                     <div style="background: #f8f9fa; padding: 15px; border-radius: 10px;">
                         <h5 style="margin-bottom: 10px;">📄 Documentos por Rol:</h5>
-                        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
                             <span style="background: #007bff; color: white; padding: 5px 15px; border-radius: 15px; font-size: 0.9em;">
                                 👔 Supervisor: ${docsByRole.supervisor}
                             </span>
@@ -1092,14 +1242,51 @@
         }
 
         function deleteEvent(id) {
-            if (confirm('⚠️ ¿Eliminar este evento?\n\nSe eliminarán todos los documentos asociados.')) {
+            const event = events.find(e => e.id === id);
+            if (!event) return;
+            
+            if (confirm(`⚠️ ¿Eliminar el evento "${event.center}" del ${formatDate(event.date)}?\n\nSe eliminarán todos los documentos asociados.`)) {
                 events = events.filter(e => e.id !== id);
+                localStorage.setItem('banquetera_events', JSON.stringify(events));
+                
+                // Si estábamos editando este evento, cancelar edición
+                if (editingEventId === id) {
+                    cancelEdit();
+                }
+                
+                displayEvents();
+                updateAdminInfo();
+                updateAdminEventsList();
+                showMessage('✅ Evento eliminado correctamente');
+            }
+        }
+
+        function cleanOldEventsManual() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const oldEvents = events.filter(event => {
+                const eventDate = new Date(event.date);
+                return eventDate < today;
+            });
+
+            if (oldEvents.length === 0) {
+                showMessage('ℹ️ No hay eventos antiguos para limpiar', 'warning');
+                return;
+            }
+
+            if (confirm(`🧹 Se eliminarán ${oldEvents.length} eventos anteriores a hoy.\n\n¿Continuar?`)) {
+                events = events.filter(event => {
+                    const eventDate = new Date(event.date);
+                    return eventDate >= today;
+                });
+
                 localStorage.setItem('banquetera_events', JSON.stringify(events));
                 
                 displayEvents();
                 updateAdminInfo();
                 updateAdminEventsList();
-                showMessage('✅ Evento eliminado');
+                showMessage(`✅ Se eliminaron ${oldEvents.length} eventos antiguos`);
             }
         }
 
@@ -1129,8 +1316,10 @@
             
             const link = document.createElement('a');
             link.href = URL.createObjectURL(dataBlob);
-            link.download = `eventos_${new Date().toISOString().split('T')[0]}.json`;
+            link.download = `eventos_banquetera_${new Date().toISOString().split('T')[0]}.json`;
             link.click();
+            
+            showMessage('📤 Datos exportados correctamente');
         }
 
         function importData(event) {
@@ -1140,7 +1329,7 @@
                 reader.onload = function(e) {
                     try {
                         const importedEvents = JSON.parse(e.target.result);
-                        if (confirm('⚠️ ¿Importar estos datos? Se sobrescribirán los eventos actuales.')) {
+                        if (confirm('⚠️ ¿Importar estos datos?\n\nEsto sobrescribirá todos los eventos actuales.')) {
                             events = importedEvents;
                             localStorage.setItem('banquetera_events', JSON.stringify(events));
                             
@@ -1150,49 +1339,12 @@
                             showMessage('✅ Datos importados correctamente');
                         }
                     } catch (error) {
-                        alert('❌ Error al leer el archivo');
+                        alert('❌ Error al leer el archivo. Verifica que sea un archivo JSON válido.');
                     }
                 };
                 reader.readAsText(file);
             }
         }
-
-        // Limpiar eventos antiguos automáticamente
-        function cleanOldEvents() {
-            const today = new Date();
-            const oneWeekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-            
-            const initialCount = events.length;
-            events = events.filter(event => {
-                const eventDate = new Date(event.date);
-                return eventDate >= oneWeekAgo;
-            });
-            
-            if (events.length !== initialCount) {
-                localStorage.setItem('banquetera_events', JSON.stringify(events));
-                console.log(`Se eliminaron ${initialCount - events.length} eventos antiguos`);
-            }
-        }
-
-        // Ejecutar limpieza al cargar la página
-        document.addEventListener('DOMContentLoaded', cleanOldEvents);
-
-        // Agregar botones de backup al panel admin
-        document.addEventListener('DOMContentLoaded', function() {
-            const adminPanel = document.getElementById('adminPanel');
-            const backupDiv = document.createElement('div');
-            backupDiv.innerHTML = `
-                <div style="background: white; padding: 20px; border-radius: 15px; margin-top: 25px; text-align: center;">
-                    <h3 style="margin-bottom: 15px;">💾 Respaldo de Datos</h3>
-                    <button class="btn btn-success" onclick="exportData()" style="margin-right: 10px;">📤 Exportar Datos</button>
-                    <label class="btn" style="background: #6c757d; color: white; cursor: pointer;">
-                        📥 Importar Datos
-                        <input type="file" accept=".json" onchange="importData(event)" style="display: none;">
-                    </label>
-                </div>
-            `;
-            adminPanel.appendChild(backupDiv);
-        });
     </script>
 </body>
 </html>
