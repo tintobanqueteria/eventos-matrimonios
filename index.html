@@ -949,12 +949,26 @@
 
         // Inicializar
         document.addEventListener('DOMContentLoaded', function() {
+            // Forzar recarga de eventos al inicio
+            events = JSON.parse(localStorage.getItem('banquetera_events')) || [];
+            console.log('Iniciando sistema con', events.length, 'eventos');
+            
             updateWeekInfo();
             displayEvents();
             updateAdminInfo();
             setupFileUpload();
             setDefaultDate();
             setupMobileOptimizations();
+            
+            // Recargar eventos cada 30 segundos para sincronización
+            setInterval(() => {
+                const newEvents = JSON.parse(localStorage.getItem('banquetera_events')) || [];
+                if (newEvents.length !== events.length) {
+                    console.log('Detectados cambios en eventos, recargando...');
+                    events = newEvents;
+                    displayEvents();
+                }
+            }, 30000);
         });
 
         function setupMobileOptimizations() {
@@ -1031,6 +1045,11 @@
         function displayEvents() {
             const container = document.getElementById('eventsContainer');
             
+            // Forzar recarga de eventos desde localStorage
+            events = JSON.parse(localStorage.getItem('banquetera_events')) || [];
+            
+            console.log('Eventos cargados:', events.length); // Para debug
+            
             container.innerHTML = '';
 
             if (events.length === 0) {
@@ -1042,6 +1061,12 @@
                         <p style="margin-top: 15px; font-size: 0.9em; color: #999;">
                             💡 <strong>Tip:</strong> Abre el panel administrativo para crear eventos de prueba
                         </p>
+                        <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 10px; text-align: left;">
+                            <p style="font-size: 0.8em; color: #666;"><strong>Debug Info:</strong></p>
+                            <p style="font-size: 0.8em; color: #666;">Navegador: ${navigator.userAgent.substring(0, 50)}...</p>
+                            <p style="font-size: 0.8em; color: #666;">Fecha actual: ${new Date().toLocaleDateString('es-ES')}</p>
+                            <p style="font-size: 0.8em; color: #666;">Eventos en memoria: ${events.length}</p>
+                        </div>
                     </div>
                 `;
                 return;
@@ -1051,26 +1076,40 @@
             
             Object.keys(eventsByDate).sort().forEach(date => {
                 const dateTitle = document.createElement('div');
-                dateTitle.style.gridColumn = '1 / -1';
-                dateTitle.style.textAlign = 'center';
-                dateTitle.style.fontSize = '1.8em';
-                dateTitle.style.fontWeight = 'bold';
-                dateTitle.style.color = '#ff6b6b';
-                dateTitle.style.margin = '30px 0 20px 0';
-                dateTitle.style.padding = '15px';
-                dateTitle.style.background = 'white';
-                dateTitle.style.borderRadius = '15px';
-                dateTitle.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
+                dateTitle.style.cssText = `
+                    grid-column: 1 / -1;
+                    text-align: center;
+                    font-size: 1.8em;
+                    font-weight: bold;
+                    color: #ff6b6b;
+                    margin: 30px 0 20px 0;
+                    padding: 15px;
+                    background: white;
+                    border-radius: 15px;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                `;
                 
-                const eventDate = new Date(date);
-                const isToday = eventDate.toDateString() === new Date().toDateString();
-                const isTomorrow = eventDate.toDateString() === new Date(Date.now() + 86400000).toDateString();
+                const eventDate = new Date(date + 'T00:00:00'); // Forzar formato correcto
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
                 
-                let dayLabel = eventDate.toLocaleDateString('es-ES', {
-                    weekday: 'long',
-                    day: 'numeric',
-                    month: 'long'
-                });
+                const tomorrow = new Date(today);
+                tomorrow.setDate(today.getDate() + 1);
+                
+                const isToday = eventDate.toDateString() === today.toDateString();
+                const isTomorrow = eventDate.toDateString() === tomorrow.toDateString();
+                
+                let dayLabel;
+                try {
+                    dayLabel = eventDate.toLocaleDateString('es-ES', {
+                        weekday: 'long',
+                        day: 'numeric',
+                        month: 'long'
+                    });
+                } catch (e) {
+                    // Fallback si hay problemas con toLocaleDateString
+                    dayLabel = eventDate.toDateString();
+                }
                 
                 if (isToday) dayLabel = `📅 HOY - ${dayLabel}`;
                 else if (isTomorrow) dayLabel = `📅 MAÑANA - ${dayLabel}`;
@@ -1474,12 +1513,18 @@
         }
 
         function updateAdminInfo() {
+            // Forzar recarga desde localStorage
+            events = JSON.parse(localStorage.getItem('banquetera_events')) || [];
+            
             document.getElementById('eventCount').textContent = events.length;
             document.getElementById('docCount').textContent = 
                 events.reduce((total, e) => total + (e.documents ? e.documents.length : 0), 0);
         }
 
         function updateAdminEventsList() {
+            // Forzar recarga desde localStorage
+            events = JSON.parse(localStorage.getItem('banquetera_events')) || [];
+            
             const container = document.getElementById('adminEventsList');
             
             container.innerHTML = '';
@@ -1513,9 +1558,12 @@
                     });
                 }
 
-                const eventDate = new Date(event.date);
-                const isToday = eventDate.toDateString() === new Date().toDateString();
-                const isPast = eventDate < new Date();
+                const eventDate = new Date(event.date + 'T00:00:00'); // Forzar formato correcto
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                const isToday = eventDate.toDateString() === today.toDateString();
+                const isPast = eventDate < today;
                 
                 let dateClass = '';
                 let datePrefix = '';
@@ -1527,11 +1575,18 @@
                     datePrefix = 'PASADO - ';
                 }
 
+                let formattedDate;
+                try {
+                    formattedDate = formatDate(event.date);
+                } catch (e) {
+                    formattedDate = event.date;
+                }
+
                 eventDiv.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                         <div>
                             <h4 style="color: #ff6b6b; margin-bottom: 5px;">${event.center}</h4>
-                            <p style="${dateClass}">📅 ${datePrefix}${formatDate(event.date)} - ⏰ ${event.time}</p>
+                            <p style="${dateClass}">📅 ${datePrefix}${formattedDate} - ⏰ ${event.time}</p>
                             <p>👥 ${event.guestCount} invitados</p>
                             ${event.observations ? `<p style="font-style: italic; color: #666;">💬 ${event.observations}</p>` : ''}
                         </div>
@@ -1608,23 +1663,35 @@
             }
         }
 
-        // Funciones utilitarias
         function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('es-ES', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                weekday: 'long'
-            });
+            try {
+                // Forzar formato correcto para evitar problemas de timezone
+                const date = new Date(dateString + 'T00:00:00');
+                return date.toLocaleDateString('es-ES', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    weekday: 'long'
+                });
+            } catch (e) {
+                // Fallback si hay problemas con el formato
+                console.log('Error formateando fecha:', dateString, e);
+                return dateString;
+            }
         }
 
         function formatDateShort(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('es-ES', {
-                month: 'short',
-                day: 'numeric'
-            });
+            try {
+                const date = new Date(dateString + 'T00:00:00');
+                return date.toLocaleDateString('es-ES', {
+                    month: 'short',
+                    day: 'numeric'
+                });
+            } catch (e) {
+                console.log('Error formateando fecha corta:', dateString, e);
+                const parts = dateString.split('-');
+                return `${parts[2]}/${parts[1]}`;
+            }
         }
 
         // Funciones para respaldo de datos
