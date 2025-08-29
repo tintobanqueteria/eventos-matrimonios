@@ -573,15 +573,7 @@
             <form id="eventForm">
                 <div class="form-group">
                     <label for="eventCenter">🏛️ Centro de Eventos</label>
-                    <select id="eventCenter" required>
-                        <option value="">Seleccionar centro...</option>
-                        <option value="Salón Principal">Salón Principal</option>
-                        <option value="Salón VIP">Salón VIP</option>
-                        <option value="Terraza Garden">Terraza Garden</option>
-                        <option value="Salón Cristal">Salón Cristal</option>
-                        <option value="Patio Andaluz">Patio Andaluz</option>
-                        <option value="Gran Salón">Gran Salón</option>
-                    </select>
+                    <input type="text" id="eventCenter" placeholder="Ej: Salón Principal, Terraza Garden, etc." required>
                 </div>
 
                 <div class="form-group">
@@ -675,9 +667,7 @@
 
         function setDefaultDate() {
             const today = new Date();
-            const nextSaturday = new Date(today);
-            nextSaturday.setDate(today.getDate() + (6 - today.getDay()));
-            document.getElementById('eventDate').value = nextSaturday.toISOString().split('T')[0];
+            document.getElementById('eventDate').value = today.toISOString().split('T')[0];
         }
 
         function updateWeekInfo() {
@@ -697,22 +687,25 @@
 
         function displayEvents() {
             const container = document.getElementById('eventsContainer');
-            const thisWeekendEvents = getThisWeekendEvents();
+            const relevantEvents = getCurrentWeekEvents();
             
             container.innerHTML = '';
 
-            if (thisWeekendEvents.length === 0) {
+            if (relevantEvents.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
                         <div class="emoji">📅</div>
                         <h3>No hay eventos programados</h3>
-                        <p>Los eventos para este fin de semana serán cargados el jueves</p>
+                        <p>Los eventos para este fin de semana aparecerán aquí cuando sean cargados</p>
+                        <p style="margin-top: 15px; font-size: 0.9em; color: #999;">
+                            💡 <strong>Tip:</strong> Para probar el sistema, crea eventos con fechas de hoy, mañana o cualquier día
+                        </p>
                     </div>
                 `;
                 return;
             }
 
-            const eventsByDate = groupEventsByDate(thisWeekendEvents);
+            const eventsByDate = groupEventsByDate(relevantEvents);
             
             Object.keys(eventsByDate).sort().forEach(date => {
                 const dateTitle = document.createElement('div');
@@ -728,11 +721,20 @@
                 dateTitle.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
                 
                 const eventDate = new Date(date);
-                dateTitle.textContent = `📅 ${eventDate.toLocaleDateString('es-ES', {
+                const isToday = eventDate.toDateString() === new Date().toDateString();
+                const isTomorrow = eventDate.toDateString() === new Date(Date.now() + 86400000).toDateString();
+                
+                let dayLabel = eventDate.toLocaleDateString('es-ES', {
                     weekday: 'long',
                     day: 'numeric',
                     month: 'long'
-                })} (${eventsByDate[date].length} eventos)`;
+                });
+                
+                if (isToday) dayLabel = `📅 HOY - ${dayLabel}`;
+                else if (isTomorrow) dayLabel = `📅 MAÑANA - ${dayLabel}`;
+                else dayLabel = `📅 ${dayLabel}`;
+                
+                dateTitle.textContent = `${dayLabel} (${eventsByDate[date].length} eventos)`;
                 
                 container.appendChild(dateTitle);
 
@@ -1023,24 +1025,24 @@
         }
 
         function updateAdminInfo() {
-            const thisWeekendEvents = getThisWeekendEvents();
-            document.getElementById('eventCount').textContent = thisWeekendEvents.length;
+            const relevantEvents = getCurrentWeekEvents();
+            document.getElementById('eventCount').textContent = relevantEvents.length;
             document.getElementById('docCount').textContent = 
-                thisWeekendEvents.reduce((total, e) => total + (e.documents ? e.documents.length : 0), 0);
+                relevantEvents.reduce((total, e) => total + (e.documents ? e.documents.length : 0), 0);
         }
 
         function updateAdminEventsList() {
             const container = document.getElementById('adminEventsList');
-            const thisWeekendEvents = getThisWeekendEvents();
+            const relevantEvents = getCurrentWeekEvents();
             
             container.innerHTML = '';
 
-            if (thisWeekendEvents.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: #666;">No hay eventos para este fin de semana</p>';
+            if (relevantEvents.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666;">No hay eventos en el rango de fechas actual</p>';
                 return;
             }
 
-            thisWeekendEvents.forEach(event => {
+            relevantEvents.forEach(event => {
                 const eventDiv = document.createElement('div');
                 eventDiv.className = 'admin-event-card';
                 
