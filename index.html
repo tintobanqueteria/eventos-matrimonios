@@ -3,10 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <title>Eventos de la Semana - Banquetera v3.0</title>
+    <title>Eventos de la Semana - Banquetera</title>
     <style>
         * {
             margin: 0;
@@ -152,6 +149,7 @@
             padding: 25px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
+            cursor: pointer;
         }
 
         .event-card:hover {
@@ -401,6 +399,35 @@
             margin-bottom: 15px;
         }
 
+        /* Estilos del panel de administración */
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #ff6b6b;
+        }
+
         .btn {
             padding: 12px 30px;
             border: none;
@@ -418,9 +445,43 @@
             color: white;
         }
 
+        .btn-danger {
+            background: linear-gradient(135deg, #ff4757, #ff3742);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #2ed573, #1e90ff);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ffa502, #ff6b35);
+            color: white;
+        }
+
         .btn-secondary {
             background: linear-gradient(135deg, #6c757d, #495057);
             color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .file-upload-area {
+            border: 3px dashed #dee2e6;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-area:hover {
+            border-color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
         }
 
         .success-message {
@@ -432,49 +493,126 @@
             border-left: 5px solid #28a745;
         }
 
-        .form-group {
-            margin-bottom: 25px;
-        }
-
-        .form-group label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #333;
-        }
-
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e9ecef;
+        .warning-message {
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px;
             border-radius: 10px;
-            font-size: 1em;
-            transition: border-color 0.3s ease;
+            margin-bottom: 20px;
+            border-left: 5px solid #ffc107;
         }
 
-        .form-group input:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #ff6b6b;
+        .events-admin {
+            margin-top: 30px;
         }
 
-        .drive-links-container {
-            background: #e3f2fd;
+        .admin-event-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .admin-tools {
+            background: white;
             padding: 20px;
             border-radius: 15px;
-            margin: 20px 0;
+            margin-bottom: 25px;
+            border: 2px solid #e9ecef;
         }
 
-        .drive-link-item {
+        /* Nuevos estilos para asignación manual de documentos */
+        .document-assignment {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+        }
+
+        .assignment-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .document-name {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .role-checkboxes {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .role-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
             background: white;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            border-left: 4px solid #2196f3;
+            border: 2px solid #dee2e6;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .role-checkbox input[type="checkbox"] {
+            margin: 0;
+            width: auto;
+            padding: 0;
+        }
+
+        .role-checkbox.supervisor {
+            border-color: #007bff;
+            color: #007bff;
+        }
+
+        .role-checkbox.supervisor input:checked {
+            accent-color: #007bff;
+        }
+
+        .role-checkbox.supermetre {
+            border-color: #28a745;
+            color: #28a745;
+        }
+
+        .role-checkbox.supermetre input:checked {
+            accent-color: #28a745;
+        }
+
+        .role-checkbox.cocina {
+            border-color: #dc3545;
+            color: #dc3545;
+        }
+
+        .role-checkbox.cocina input:checked {
+            accent-color: #dc3545;
+        }
+
+        .remove-file-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+
+        .edit-mode {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+        }
+
+        .edit-mode .modal-title {
+            color: #856404;
         }
 
         @media (max-width: 768px) {
@@ -509,6 +647,7 @@
 
             .event-card {
                 padding: 20px;
+                margin-bottom: 0;
             }
 
             .event-header {
@@ -578,18 +717,98 @@
                 padding: 12px 20px;
             }
 
+            .role-checkboxes {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+
+            .role-checkbox {
+                justify-content: center;
+                padding: 12px 15px;
+            }
+
+            .btn {
+                margin-right: 5px;
+                margin-bottom: 8px;
+                padding: 10px 20px;
+                font-size: 0.9em;
+            }
+
+            .form-group input,
+            .form-group textarea {
+                font-size: 16px; /* Evita zoom en iOS */
+            }
+
+            .week-info {
+                padding: 20px 15px;
+            }
+
+            .week-info h2 {
+                font-size: 1.6em;
+            }
+
+            .admin-event-card {
+                padding: 15px;
+            }
+
+            .admin-event-card > div:first-child {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+            }
+
+            .admin-event-card h4 {
+                font-size: 1.2em;
+            }
+
             .password-content {
                 padding: 25px 20px;
                 margin: 15px;
             }
 
             .password-input {
-                font-size: 16px;
+                font-size: 16px; /* Evita zoom en iOS */
             }
 
-            .drive-link-item {
+            /* Mejoras adicionales para móvil */
+            .event-info p {
+                font-size: 1em;
+                flex-wrap: wrap;
+            }
+
+            .event-info strong {
+                min-width: auto;
+                margin-right: 5px;
+            }
+
+            .empty-state {
+                padding: 40px 15px;
+            }
+
+            .empty-state .emoji {
+                font-size: 4em;
+            }
+
+            .file-upload-area {
+                padding: 30px 15px;
+            }
+
+            .document-assignment {
+                padding: 15px;
+            }
+
+            .assignment-header {
                 flex-direction: column;
                 gap: 10px;
+            }
+
+            .admin-tools {
+                text-align: center;
+            }
+
+            .stats-container p {
+                font-size: 0.95em;
             }
         }
     </style>
@@ -616,17 +835,33 @@
     <div class="container">
         <!-- Panel de Administración (Oculto por defecto) -->
         <div id="adminPanel" class="admin-panel">
-            <h2 style="color: #ff6b6b; margin-bottom: 25px;">🔧 Panel de Administración - Google Drive</h2>
+            <h2 style="color: #ff6b6b; margin-bottom: 25px;">🔧 Panel de Administración</h2>
+            
+            <div class="admin-tools">
+                <h3 style="margin-bottom: 15px;">⚙️ Herramientas de Gestión</h3>
+                <button class="btn btn-warning" onclick="cleanOldEventsManual()">🧹 Limpiar Eventos Antiguos</button>
+                <button class="btn btn-success" onclick="exportData()">📤 Exportar Datos</button>
+                <label class="btn btn-secondary" style="cursor: pointer;">
+                    📥 Importar Datos
+                    <input type="file" accept=".json" onchange="importData(event)" style="display: none;">
+                </label>
+            </div>
             
             <div style="background: white; padding: 25px; border-radius: 15px; margin-bottom: 25px;">
                 <h3>📊 Resumen</h3>
                 <p><strong>Total eventos:</strong> <span id="eventCount">0</span></p>
+                <p><strong>Total documentos:</strong> <span id="docCount">0</span></p>
+            </div>
+
+            <div id="editEventContainer" style="display: none;" class="edit-mode">
+                <h3 style="color: #856404; margin-bottom: 20px;">✏️ Editando Evento</h3>
+                <button class="btn btn-secondary" onclick="cancelEdit()">❌ Cancelar Edición</button>
             </div>
 
             <form id="eventForm">
                 <div class="form-group">
                     <label for="eventCenter">🏛️ Centro de Eventos</label>
-                    <input type="text" id="eventCenter" placeholder="Nombre del centro de eventos" required>
+                    <input type="text" id="eventCenter" placeholder="Escribe el nombre del centro: Ej. Salón Principal, Terraza Garden, etc." required>
                 </div>
 
                 <div class="form-group">
@@ -641,46 +876,40 @@
 
                 <div class="form-group">
                     <label for="guestCount">👥 Número de Invitados</label>
-                    <input type="number" id="guestCount" placeholder="150" min="1" required>
+                    <input type="number" id="guestCount" placeholder="Ej: 150" min="1" required>
                 </div>
 
                 <div class="form-group">
                     <label for="observations">📝 Observaciones</label>
-                    <textarea id="observations" rows="3" placeholder="Observaciones especiales..."></textarea>
+                    <textarea id="observations" rows="3" placeholder="Alergias, decoración especial, etc."></textarea>
                 </div>
 
                 <div class="form-group">
-                    <label>📄 Documentos desde Google Drive</label>
-                    <div style="background: #fff3cd; padding: 15px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid #ffc107;">
-                        <h4 style="color: #856404; margin-bottom: 10px;">📋 Instrucciones:</h4>
-                        <ol style="color: #856404; margin-left: 20px;">
-                            <li>Sube tus PDFs a Google Drive</li>
-                            <li>Para cada archivo: Clic derecho → "Compartir" → "Cualquier persona con el enlace"</li>
-                            <li>Copia el enlace y pégalo abajo</li>
-                            <li>Asigna a qué roles puede verlo</li>
-                        </ol>
+                    <label>📄 Documentos y Asignación por Roles</label>
+                    <div class="file-upload-area" onclick="document.getElementById('fileInput').click()">
+                        <div style="font-size: 3em; margin-bottom: 15px;">📄</div>
+                        <p><strong>Subir documentos PDF</strong></p>
+                        <p>Después podrás asignar cada documento a los roles correspondientes</p>
                     </div>
-                    
-                    <div id="driveLinksContainer" class="drive-links-container">
-                        <h4 style="color: #1976d2; margin-bottom: 15px;">Enlaces de Google Drive:</h4>
-                        <div id="driveLinksList">
-                            <!-- Enlaces se agregan aquí -->
-                        </div>
-                        <button type="button" class="btn btn-primary" onclick="addDriveLink()">➕ Agregar Documento</button>
+                    <input type="file" id="fileInput" multiple accept=".pdf" style="display: none;">
+                    <div id="documentsAssignment" style="margin-top: 20px;">
+                        <!-- Aquí se mostrarán los documentos para asignar roles -->
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary">➕ Crear Evento</button>
+                <button type="submit" class="btn btn-primary" id="submitBtn">➕ Agregar Evento</button>
             </form>
+
+            <div class="events-admin">
+                <h3>📋 Todos los Eventos</h3>
+                <div id="adminEventsList"></div>
+            </div>
         </div>
 
         <!-- Contenido Principal -->
         <div class="header">
             <h1>🍽️ Eventos de la Semana</h1>
             <p>Selecciona tu evento y después tu rol para ver los documentos</p>
-            <div style="font-size: 0.8em; opacity: 0.7; margin-top: 10px;">
-                Versión 3.0 - Google Drive Compatible
-            </div>
         </div>
 
         <div class="main-content">
@@ -711,52 +940,33 @@
 
     <script>
         // Estado global
-        let events = JSON.parse(localStorage.getItem('banquetera_events')) || 
-                    JSON.parse(localStorage.getItem('banquetera_events_drive')) || [];
+        let events = JSON.parse(localStorage.getItem('banquetera_events')) || [];
         let adminPanelVisible = false;
+        let currentFiles = [];
+        let editingEventId = null;
         let isAuthenticated = false;
-        let driveLinksCount = 0;
         const ADMIN_PASSWORD = 'Pagoda1234';
 
         // Inicializar
         document.addEventListener('DOMContentLoaded', function() {
-            // Migrar datos si existen en el almacenamiento antiguo
-            migrateOldData();
+            updateWeekInfo();
             displayEvents();
             updateAdminInfo();
+            setupFileUpload();
+            setDefaultDate();
             setupMobileOptimizations();
         });
 
-        function migrateOldData() {
-            // Verificar si hay datos en el almacenamiento antiguo
-            const oldEvents = JSON.parse(localStorage.getItem('banquetera_events')) || [];
-            const driveEvents = JSON.parse(localStorage.getItem('banquetera_events_drive')) || [];
-            
-            // Combinar todos los eventos
-            const allEvents = [...oldEvents, ...driveEvents];
-            
-            // Eliminar duplicados por ID
-            const uniqueEvents = allEvents.filter((event, index, self) => 
-                index === self.findIndex(e => e.id === event.id)
-            );
-            
-            if (uniqueEvents.length > 0) {
-                events = uniqueEvents;
-                // Guardar en el almacenamiento principal
-                localStorage.setItem('banquetera_events', JSON.stringify(events));
-                // Limpiar almacenamiento temporal si existe
-                localStorage.removeItem('banquetera_events_drive');
-                console.log(`Migrados ${uniqueEvents.length} eventos al almacenamiento unificado`);
-            }
-        }
-
         function setupMobileOptimizations() {
+            // Prevenir zoom en inputs en iOS
             if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
                 const viewport = document.querySelector('meta[name=viewport]');
                 if (viewport) {
                     viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
                 }
             }
+
+            // Mejorar experiencia táctil
             document.addEventListener('touchstart', function() {}, true);
         }
 
@@ -779,18 +989,20 @@
                 isAuthenticated = true;
                 closePasswordModal();
                 toggleAdminPanel();
-                showMessage('🎉 ¡Acceso autorizado! Panel administrativo activado');
+                showMessage('🎉 ¡Acceso autorizado! Bienvenido al panel administrativo');
             } else {
                 document.getElementById('passwordError').style.display = 'block';
                 document.getElementById('passwordInput').value = '';
                 document.getElementById('passwordInput').focus();
                 
+                // Vibrar en móviles si está disponible
                 if (navigator.vibrate) {
                     navigator.vibrate(200);
                 }
             }
         }
 
+        // Permitir envío con Enter en el campo de contraseña
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('passwordInput').addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
@@ -799,143 +1011,22 @@
             });
         });
 
+        // Cerrar modal de contraseña con Escape
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closePasswordModal();
             }
         });
 
-        function toggleAdminPanel() {
-            if (!isAuthenticated) {
-                requestAdminAccess();
-                return;
-            }
-
-            adminPanelVisible = !adminPanelVisible;
-            const panel = document.getElementById('adminPanel');
-            const toggleBtn = document.querySelector('.admin-toggle');
-            
-            if (adminPanelVisible) {
-                panel.classList.add('active');
-                toggleBtn.textContent = '❌ Cerrar Admin';
-                toggleBtn.style.background = 'rgba(220, 53, 69, 0.9)';
-                toggleBtn.style.color = 'white';
-            } else {
-                panel.classList.remove('active');
-                toggleBtn.textContent = '🔧 Admin';
-                toggleBtn.style.background = 'rgba(255, 255, 255, 0.9)';
-                toggleBtn.style.color = '#333';
-                setTimeout(() => {
-                    isAuthenticated = false;
-                }, 300000);
-            }
+        function setDefaultDate() {
+            const today = new Date();
+            document.getElementById('eventDate').value = today.toISOString().split('T')[0];
         }
 
-        function addDriveLink() {
-            driveLinksCount++;
-            const container = document.getElementById('driveLinksList');
-            
-            const linkItem = document.createElement('div');
-            linkItem.className = 'drive-link-item';
-            linkItem.id = `driveLink${driveLinksCount}`;
-            linkItem.innerHTML = `
-                <div style="width: 100%; margin-bottom: 10px;">
-                    <label style="font-weight: bold; margin-bottom: 5px; display: block;">📄 Nombre del documento:</label>
-                    <input type="text" placeholder="Ej: Menú Principal, Lista de Invitados..." style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
-                </div>
-                <div style="width: 100%; margin-bottom: 10px;">
-                    <label style="font-weight: bold; margin-bottom: 5px; display: block;">🔗 Enlace de Google Drive:</label>
-                    <input type="url" placeholder="https://drive.google.com/file/d/..." style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
-                </div>
-                <div style="width: 100%; margin-bottom: 10px;">
-                    <label style="font-weight: bold; margin-bottom: 5px; display: block;">👥 ¿Quién puede verlo?</label>
-                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                        <label style="display: flex; align-items: center; gap: 5px;">
-                            <input type="checkbox" value="supervisor"> 👔 Supervisor
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 5px;">
-                            <input type="checkbox" value="supermetre"> 🎩 Supermetre  
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 5px;">
-                            <input type="checkbox" value="cocina"> 👨‍🍳 Cocina
-                        </label>
-                    </div>
-                </div>
-                <button type="button" onclick="removeDriveLink(${driveLinksCount})" style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">❌ Eliminar</button>
-            `;
-            
-            container.appendChild(linkItem);
+        function updateWeekInfo() {
+            document.getElementById('currentWeek').textContent = 'Eventos Disponibles';
+            document.getElementById('weekDates').textContent = 'Mostrando todos los eventos activos';
         }
-
-        function removeDriveLink(id) {
-            const element = document.getElementById(`driveLink${id}`);
-            if (element) {
-                element.remove();
-            }
-        }
-
-        // Manejar envío del formulario
-        document.getElementById('eventForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Recopilar enlaces de Drive
-            const driveLinks = [];
-            const linkItems = document.querySelectorAll('.drive-link-item');
-            
-            linkItems.forEach(item => {
-                const name = item.querySelector('input[type="text"]').value.trim();
-                const url = item.querySelector('input[type="url"]').value.trim();
-                const roles = Array.from(item.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
-                
-                if (name && url && roles.length > 0) {
-                    // Convertir enlace de Drive al formato preview
-                    let finalUrl = url;
-                    if (url.includes('drive.google.com/file/d/')) {
-                        const fileId = url.match(/\/file\/d\/([a-zA-Z0-9-_]+)/);
-                        if (fileId) {
-                            finalUrl = `https://drive.google.com/file/d/${fileId[1]}/preview`;
-                        }
-                    }
-                    
-                    driveLinks.push({
-                        name: name,
-                        url: finalUrl,
-                        originalUrl: url,
-                        roles: roles
-                    });
-                }
-            });
-            
-            if (driveLinks.length === 0) {
-                alert('⚠️ Debes agregar al menos un documento con enlace de Google Drive y asignar roles.');
-                return;
-            }
-            
-            const event = {
-                id: Date.now(),
-                center: document.getElementById('eventCenter').value,
-                date: document.getElementById('eventDate').value,
-                time: document.getElementById('eventTime').value,
-                guestCount: document.getElementById('guestCount').value,
-                observations: document.getElementById('observations').value,
-                documents: driveLinks,
-                created: new Date().toISOString()
-            };
-
-            events.push(event);
-            localStorage.setItem('banquetera_events', JSON.stringify(events));
-
-            showMessage('✅ ¡Evento creado correctamente con documentos de Google Drive!');
-            
-            // Limpiar formulario
-            this.reset();
-            document.getElementById('driveLinksList').innerHTML = '';
-            driveLinksCount = 0;
-            
-            // Actualizar vistas
-            displayEvents();
-            updateAdminInfo();
-        });
 
         function displayEvents() {
             const container = document.getElementById('eventsContainer');
@@ -949,7 +1040,7 @@
                         <h3>No hay eventos programados</h3>
                         <p>Los eventos aparecerán aquí cuando sean cargados desde el panel administrativo</p>
                         <p style="margin-top: 15px; font-size: 0.9em; color: #999;">
-                            💡 <strong>Tip:</strong> Usa el botón "🔧 Admin" para crear eventos con enlaces de Google Drive
+                            💡 <strong>Tip:</strong> Abre el panel administrativo para crear eventos de prueba
                         </p>
                     </div>
                 `;
@@ -960,39 +1051,26 @@
             
             Object.keys(eventsByDate).sort().forEach(date => {
                 const dateTitle = document.createElement('div');
-                dateTitle.style.cssText = `
-                    grid-column: 1 / -1;
-                    text-align: center;
-                    font-size: 1.8em;
-                    font-weight: bold;
-                    color: #ff6b6b;
-                    margin: 30px 0 20px 0;
-                    padding: 15px;
-                    background: white;
-                    border-radius: 15px;
-                    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-                `;
+                dateTitle.style.gridColumn = '1 / -1';
+                dateTitle.style.textAlign = 'center';
+                dateTitle.style.fontSize = '1.8em';
+                dateTitle.style.fontWeight = 'bold';
+                dateTitle.style.color = '#ff6b6b';
+                dateTitle.style.margin = '30px 0 20px 0';
+                dateTitle.style.padding = '15px';
+                dateTitle.style.background = 'white';
+                dateTitle.style.borderRadius = '15px';
+                dateTitle.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
                 
-                const eventDate = new Date(date + 'T00:00:00');
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
+                const eventDate = new Date(date);
+                const isToday = eventDate.toDateString() === new Date().toDateString();
+                const isTomorrow = eventDate.toDateString() === new Date(Date.now() + 86400000).toDateString();
                 
-                const tomorrow = new Date(today);
-                tomorrow.setDate(today.getDate() + 1);
-                
-                const isToday = eventDate.toDateString() === today.toDateString();
-                const isTomorrow = eventDate.toDateString() === tomorrow.toDateString();
-                
-                let dayLabel;
-                try {
-                    dayLabel = eventDate.toLocaleDateString('es-ES', {
-                        weekday: 'long',
-                        day: 'numeric',
-                        month: 'long'
-                    });
-                } catch (e) {
-                    dayLabel = eventDate.toDateString();
-                }
+                let dayLabel = eventDate.toLocaleDateString('es-ES', {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long'
+                });
                 
                 if (isToday) dayLabel = `📅 HOY - ${dayLabel}`;
                 else if (isTomorrow) dayLabel = `📅 MAÑANA - ${dayLabel}`;
@@ -1092,10 +1170,10 @@
                             <div class="document-icon">📄</div>
                             <div class="document-details">
                                 <h4>${doc.name}</h4>
-                                <p>Documento de Google Drive</p>
+                                <p>Tamaño: ${(doc.size / 1024 / 1024).toFixed(2)} MB</p>
                             </div>
                         </div>
-                        <button class="view-btn" onclick="openDriveDocument('${doc.url}', '${doc.name}')">
+                        <button class="view-btn" onclick="openDocument('${doc.url}', '${doc.name}')">
                             👁️ Ver Documento
                         </button>
                     `;
@@ -1106,16 +1184,17 @@
             document.getElementById('documentsModal').classList.add('active');
         }
 
-        function openDriveDocument(url, name) {
-            // Abrir documento de Google Drive en nueva ventana/pestaña
-            const newWindow = window.open(url, '_blank');
-            
-            // Fallback si el popup fue bloqueado
-            if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
-                // Intentar con location.href si el popup falla
-                if (confirm(`¿Abrir "${name}" en esta misma ventana?`)) {
-                    window.location.href = url;
-                }
+        function openDocument(url, name) {
+            // En móviles, abrir en nueva ventana funciona mejor
+            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                window.open(url, '_blank');
+            } else {
+                // En desktop, crear un enlace de descarga si es necesario
+                const link = document.createElement('a');
+                link.href = url;
+                link.target = '_blank';
+                link.download = name;
+                link.click();
             }
         }
 
@@ -1127,62 +1206,463 @@
             if (e.target === this) closeModal();
         }
 
-        function updateAdminInfo() {
-            document.getElementById('eventCount').textContent = events.length;
-        }
+        // PANEL DE ADMINISTRACIÓN
+        function toggleAdminPanel() {
+            if (!isAuthenticated) {
+                requestAdminAccess();
+                return;
+            }
 
-        // Funciones utilitarias
-        function formatDate(dateString) {
-            try {
-                const date = new Date(dateString + 'T00:00:00');
-                return date.toLocaleDateString('es-ES', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    weekday: 'long'
-                });
-            } catch (e) {
-                console.log('Error formateando fecha:', dateString, e);
-                return dateString;
+            adminPanelVisible = !adminPanelVisible;
+            const panel = document.getElementById('adminPanel');
+            const toggleBtn = document.querySelector('.admin-toggle');
+            
+            if (adminPanelVisible) {
+                panel.classList.add('active');
+                toggleBtn.textContent = '❌ Cerrar Admin';
+                toggleBtn.style.background = 'rgba(220, 53, 69, 0.9)';
+                toggleBtn.style.color = 'white';
+                updateAdminEventsList();
+            } else {
+                panel.classList.remove('active');
+                toggleBtn.textContent = '🔧 Admin';
+                toggleBtn.style.background = 'rgba(255, 255, 255, 0.9)';
+                toggleBtn.style.color = '#333';
+                // Logout después de cerrar panel
+                setTimeout(() => {
+                    isAuthenticated = false;
+                }, 300000); // 5 minutos
             }
         }
 
-        function formatDateShort(dateString) {
-            try {
-                const date = new Date(dateString + 'T00:00:00');
-                return date.toLocaleDateString('es-ES', {
-                    month: 'short',
-                    day: 'numeric'
-                });
-            } catch (e) {
-                console.log('Error formateando fecha corta:', dateString, e);
-                const parts = dateString.split('-');
-                return `${parts[2]}/${parts[1]}`;
+        function setupFileUpload() {
+            const fileInput = document.getElementById('fileInput');
+            const fileUploadArea = document.querySelector('.file-upload-area');
+
+            fileInput.addEventListener('change', handleFiles);
+            fileUploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                fileUploadArea.style.borderColor = '#ff6b6b';
+            });
+            fileUploadArea.addEventListener('dragleave', () => {
+                fileUploadArea.style.borderColor = '#dee2e6';
+            });
+            fileUploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                fileUploadArea.style.borderColor = '#dee2e6';
+                const files = Array.from(e.dataTransfer.files).filter(file => file.type === 'application/pdf');
+                processFiles(files);
+            });
+        }
+
+        function handleFiles(e) {
+            const files = Array.from(e.target.files);
+            processFiles(files);
+        }
+
+        function processFiles(files) {
+            // Si estamos editando, mantener documentos existentes
+            if (editingEventId) {
+                const existingEvent = events.find(e => e.id === editingEventId);
+                if (existingEvent && existingEvent.documents) {
+                    // Añadir nuevos archivos a los existentes
+                    const newFiles = files.map(file => ({
+                        file: file,
+                        name: file.name,
+                        size: file.size,
+                        url: URL.createObjectURL(file),
+                        roles: []
+                    }));
+                    currentFiles = [...currentFiles, ...newFiles];
+                } else {
+                    currentFiles = files.map(file => ({
+                        file: file,
+                        name: file.name,
+                        size: file.size,
+                        url: URL.createObjectURL(file),
+                        roles: []
+                    }));
+                }
+            } else {
+                currentFiles = files.map(file => ({
+                    file: file,
+                    name: file.name,
+                    size: file.size,
+                    url: URL.createObjectURL(file),
+                    roles: []
+                }));
+            }
+            displayDocumentAssignment();
+        }
+
+        function displayDocumentAssignment() {
+            const container = document.getElementById('documentsAssignment');
+            container.innerHTML = '';
+
+            if (currentFiles.length === 0) {
+                container.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">No hay documentos subidos aún</p>';
+                return;
+            }
+
+            currentFiles.forEach((fileData, index) => {
+                const assignmentDiv = document.createElement('div');
+                assignmentDiv.className = 'document-assignment';
+                assignmentDiv.innerHTML = `
+                    <div class="assignment-header">
+                        <div class="document-name">📄 ${fileData.name}</div>
+                        <button class="remove-file-btn" onclick="removeFileFromList(${index})">❌ Eliminar</button>
+                    </div>
+                    <div style="margin-bottom: 15px; color: #666; font-size: 0.9em;">
+                        Selecciona a qué roles debe estar disponible este documento:
+                    </div>
+                    <div class="role-checkboxes">
+                        <label class="role-checkbox supervisor">
+                            <input type="checkbox" onchange="toggleRole(${index}, 'supervisor')" ${fileData.roles.includes('supervisor') ? 'checked' : ''}>
+                            <span>👔 Supervisor</span>
+                        </label>
+                        <label class="role-checkbox supermetre">
+                            <input type="checkbox" onchange="toggleRole(${index}, 'supermetre')" ${fileData.roles.includes('supermetre') ? 'checked' : ''}>
+                            <span>🎩 Supermetre</span>
+                        </label>
+                        <label class="role-checkbox cocina">
+                            <input type="checkbox" onchange="toggleRole(${index}, 'cocina')" ${fileData.roles.includes('cocina') ? 'checked' : ''}>
+                            <span>👨‍🍳 Cocina</span>
+                        </label>
+                    </div>
+                `;
+                container.appendChild(assignmentDiv);
+            });
+        }
+
+        function toggleRole(fileIndex, role) {
+            const fileData = currentFiles[fileIndex];
+            if (fileData.roles.includes(role)) {
+                fileData.roles = fileData.roles.filter(r => r !== role);
+            } else {
+                fileData.roles.push(role);
             }
         }
+
+        function removeFileFromList(index) {
+            currentFiles.splice(index, 1);
+            displayDocumentAssignment();
+        }
+
+        // Funciones para editar eventos
+        function editEvent(eventId) {
+            const event = events.find(e => e.id === eventId);
+            if (!event) return;
+
+            editingEventId = eventId;
+            
+            // Mostrar indicador de modo edición
+            document.getElementById('editEventContainer').style.display = 'block';
+            
+            // Llenar formulario con datos existentes
+            document.getElementById('eventCenter').value = event.center;
+            document.getElementById('eventDate').value = event.date;
+            document.getElementById('eventTime').value = event.time;
+            document.getElementById('guestCount').value = event.guestCount;
+            document.getElementById('observations').value = event.observations || '';
+            
+            // Cargar documentos existentes
+            if (event.documents) {
+                currentFiles = event.documents.map(doc => ({
+                    name: doc.name,
+                    size: doc.size,
+                    url: doc.url,
+                    roles: doc.roles || [],
+                    isExisting: true
+                }));
+                displayDocumentAssignment();
+            } else {
+                currentFiles = [];
+                displayDocumentAssignment();
+            }
+
+            // Cambiar texto del botón
+            document.getElementById('submitBtn').textContent = '💾 Actualizar Evento';
+            
+            // Hacer scroll al formulario
+            document.getElementById('eventForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function cancelEdit() {
+            editingEventId = null;
+            document.getElementById('editEventContainer').style.display = 'none';
+            document.getElementById('submitBtn').textContent = '➕ Agregar Evento';
+            
+            // Limpiar formulario
+            document.getElementById('eventForm').reset();
+            currentFiles = [];
+            displayDocumentAssignment();
+            setDefaultDate();
+        }
+
+        // Manejar envío del formulario
+        document.getElementById('eventForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Verificar que todos los documentos tengan al menos un rol asignado
+            const unassignedFiles = currentFiles.filter(fileData => fileData.roles.length === 0);
+            
+            if (unassignedFiles.length > 0) {
+                alert(`⚠️ Los siguientes documentos no tienen roles asignados:\n\n${unassignedFiles.map(f => f.name).join('\n')}\n\nPor favor asigna al menos un rol a cada documento o elimínalo.`);
+                return;
+            }
+            
+            const eventData = {
+                center: document.getElementById('eventCenter').value,
+                date: document.getElementById('eventDate').value,
+                time: document.getElementById('eventTime').value,
+                guestCount: document.getElementById('guestCount').value,
+                observations: document.getElementById('observations').value,
+                documents: currentFiles.map(fileData => ({
+                    name: fileData.name,
+                    size: fileData.size,
+                    url: fileData.url,
+                    roles: fileData.roles
+                }))
+            };
+
+            if (editingEventId) {
+                // Actualizar evento existente
+                const eventIndex = events.findIndex(e => e.id === editingEventId);
+                events[eventIndex] = {
+                    ...events[eventIndex],
+                    ...eventData,
+                    updated: new Date().toISOString()
+                };
+                showMessage('✅ ¡Evento actualizado correctamente!');
+                cancelEdit();
+            } else {
+                // Crear nuevo evento
+                const newEvent = {
+                    id: Date.now(),
+                    ...eventData,
+                    created: new Date().toISOString()
+                };
+                events.push(newEvent);
+                showMessage('✅ ¡Evento creado correctamente!');
+                
+                // Limpiar formulario
+                this.reset();
+                currentFiles = [];
+                displayDocumentAssignment();
+                setDefaultDate();
+            }
+
+            localStorage.setItem('banquetera_events', JSON.stringify(events));
+            
+            // Actualizar vistas
+            displayEvents();
+            updateAdminInfo();
+            updateAdminEventsList();
+        });
 
         function showMessage(message, type = 'success') {
             const messageDiv = document.createElement('div');
-            messageDiv.className = type === 'success' ? 'success-message' : 'error-message';
+            messageDiv.className = type === 'success' ? 'success-message' : 'warning-message';
             messageDiv.textContent = message;
             
-            const adminPanel = document.getElementById('adminPanel');
-            adminPanel.insertBefore(messageDiv, adminPanel.firstChild);
+            const form = document.getElementById('eventForm');
+            form.insertBefore(messageDiv, form.firstChild);
             
             setTimeout(() => {
                 messageDiv.remove();
             }, 4000);
         }
 
-        // Auto-agregar primer enlace de Drive al cargar
-        document.addEventListener('DOMContentLoaded', function() {
-            // Agregar un campo de Drive por defecto cuando se carga la página
-            setTimeout(() => {
-                if (driveLinksCount === 0) {
-                    addDriveLink();
+        function updateAdminInfo() {
+            document.getElementById('eventCount').textContent = events.length;
+            document.getElementById('docCount').textContent = 
+                events.reduce((total, e) => total + (e.documents ? e.documents.length : 0), 0);
+        }
+
+        function updateAdminEventsList() {
+            const container = document.getElementById('adminEventsList');
+            
+            container.innerHTML = '';
+
+            if (events.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666;">No hay eventos creados aún</p>';
+                return;
+            }
+
+            // Ordenar eventos por fecha
+            const sortedEvents = [...events].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            sortedEvents.forEach(event => {
+                const eventDiv = document.createElement('div');
+                eventDiv.className = 'admin-event-card';
+                
+                // Contar documentos por rol
+                const docsByRole = {
+                    supervisor: 0,
+                    supermetre: 0,
+                    cocina: 0
+                };
+
+                if (event.documents) {
+                    event.documents.forEach(doc => {
+                        if (doc.roles) {
+                            doc.roles.forEach(role => {
+                                docsByRole[role]++;
+                            });
+                        }
+                    });
                 }
-            }, 1000);
-        });
+
+                const eventDate = new Date(event.date);
+                const isToday = eventDate.toDateString() === new Date().toDateString();
+                const isPast = eventDate < new Date();
+                
+                let dateClass = '';
+                let datePrefix = '';
+                if (isToday) {
+                    dateClass = 'color: #ff6b6b; font-weight: bold;';
+                    datePrefix = 'HOY - ';
+                } else if (isPast) {
+                    dateClass = 'color: #999;';
+                    datePrefix = 'PASADO - ';
+                }
+
+                eventDiv.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <div>
+                            <h4 style="color: #ff6b6b; margin-bottom: 5px;">${event.center}</h4>
+                            <p style="${dateClass}">📅 ${datePrefix}${formatDate(event.date)} - ⏰ ${event.time}</p>
+                            <p>👥 ${event.guestCount} invitados</p>
+                            ${event.observations ? `<p style="font-style: italic; color: #666;">💬 ${event.observations}</p>` : ''}
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 5px;">
+                            <button class="btn btn-warning" onclick="editEvent(${event.id})" style="padding: 8px 15px;">✏️ Editar</button>
+                            <button class="btn btn-danger" onclick="deleteEvent(${event.id})" style="padding: 8px 15px;">🗑️ Eliminar</button>
+                        </div>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 10px;">
+                        <h5 style="margin-bottom: 10px;">📄 Documentos por Rol:</h5>
+                        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                            <span style="background: #007bff; color: white; padding: 5px 15px; border-radius: 15px; font-size: 0.9em;">
+                                👔 Supervisor: ${docsByRole.supervisor}
+                            </span>
+                            <span style="background: #28a745; color: white; padding: 5px 15px; border-radius: 15px; font-size: 0.9em;">
+                                🎩 Supermetre: ${docsByRole.supermetre}
+                            </span>
+                            <span style="background: #dc3545; color: white; padding: 5px 15px; border-radius: 15px; font-size: 0.9em;">
+                                👨‍🍳 Cocina: ${docsByRole.cocina}
+                            </span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(eventDiv);
+            });
+        }
+
+        function deleteEvent(id) {
+            const event = events.find(e => e.id === id);
+            if (!event) return;
+            
+            if (confirm(`⚠️ ¿Eliminar el evento "${event.center}" del ${formatDate(event.date)}?\n\nSe eliminarán todos los documentos asociados.`)) {
+                events = events.filter(e => e.id !== id);
+                localStorage.setItem('banquetera_events', JSON.stringify(events));
+                
+                // Si estábamos editando este evento, cancelar edición
+                if (editingEventId === id) {
+                    cancelEdit();
+                }
+                
+                displayEvents();
+                updateAdminInfo();
+                updateAdminEventsList();
+                showMessage('✅ Evento eliminado correctamente');
+            }
+        }
+
+        function cleanOldEventsManual() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const oldEvents = events.filter(event => {
+                const eventDate = new Date(event.date);
+                return eventDate < today;
+            });
+
+            if (oldEvents.length === 0) {
+                showMessage('ℹ️ No hay eventos antiguos para limpiar', 'warning');
+                return;
+            }
+
+            if (confirm(`🧹 Se eliminarán ${oldEvents.length} eventos anteriores a hoy.\n\n¿Continuar?`)) {
+                events = events.filter(event => {
+                    const eventDate = new Date(event.date);
+                    return eventDate >= today;
+                });
+
+                localStorage.setItem('banquetera_events', JSON.stringify(events));
+                
+                displayEvents();
+                updateAdminInfo();
+                updateAdminEventsList();
+                showMessage(`✅ Se eliminaron ${oldEvents.length} eventos antiguos`);
+            }
+        }
+
+        // Funciones utilitarias
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-ES', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                weekday: 'long'
+            });
+        }
+
+        function formatDateShort(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-ES', {
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+
+        // Funciones para respaldo de datos
+        function exportData() {
+            const dataStr = JSON.stringify(events, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `eventos_banquetera_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            
+            showMessage('📤 Datos exportados correctamente');
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const importedEvents = JSON.parse(e.target.result);
+                        if (confirm('⚠️ ¿Importar estos datos?\n\nEsto sobrescribirá todos los eventos actuales.')) {
+                            events = importedEvents;
+                            localStorage.setItem('banquetera_events', JSON.stringify(events));
+                            
+                            displayEvents();
+                            updateAdminInfo();
+                            updateAdminEventsList();
+                            showMessage('✅ Datos importados correctamente');
+                        }
+                    } catch (error) {
+                        alert('❌ Error al leer el archivo. Verifica que sea un archivo JSON válido.');
+                    }
+                };
+                reader.readAsText(file);
+            }
+        }
     </script>
 </body>
 </html>
