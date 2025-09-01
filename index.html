@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Eventos de la Semana - Banquetera v3.1</title>
+    <title>Eventos de la Semana - Banquetera v4.0</title>
     <style>
         * {
             margin: 0;
@@ -61,6 +61,7 @@
             display: flex;
             align-items: center;
             gap: 5px;
+            cursor: pointer;
         }
 
         .sync-status.syncing {
@@ -145,20 +146,20 @@
             display: block;
         }
 
-        .sync-config {
-            background: #e8f5e8;
+        .github-config {
+            background: #f6f8fa;
             padding: 20px;
             border-radius: 15px;
             margin-bottom: 25px;
-            border-left: 4px solid #28a745;
+            border-left: 4px solid #24292e;
         }
 
-        .sync-warning {
-            background: #fff3cd;
+        .config-step {
+            background: white;
             padding: 15px;
             border-radius: 10px;
-            margin-bottom: 15px;
-            border-left: 4px solid #ffc107;
+            margin: 10px 0;
+            border-left: 3px solid #28a745;
         }
 
         .main-content {
@@ -474,6 +475,11 @@
             color: white;
         }
 
+        .btn-github {
+            background: linear-gradient(135deg, #24292e, #1b1f23);
+            color: white;
+        }
+
         .success-message {
             background: #d4edda;
             color: #155724;
@@ -535,39 +541,6 @@
             border-radius: 8px;
             margin-bottom: 10px;
             border-left: 4px solid #2196f3;
-        }
-
-        .share-section {
-            background: #f0f8ff;
-            padding: 20px;
-            border-radius: 15px;
-            margin: 25px 0;
-            border-left: 4px solid #007bff;
-        }
-
-        .share-url-container {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .share-url-input {
-            flex: 1;
-            padding: 10px;
-            border: 2px solid #007bff;
-            border-radius: 8px;
-            font-family: monospace;
-            font-size: 0.9em;
-        }
-
-        .copy-btn {
-            padding: 10px 20px;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
         }
 
         @media (max-width: 768px) {
@@ -690,114 +663,109 @@
                 flex-direction: column;
                 gap: 10px;
             }
-
-            .share-url-container {
-                flex-direction: column;
-            }
-
-            .copy-btn {
-                width: 100%;
-            }
         }
     </style>
 </head>
 <body>
-    <div id="syncStatus" class="sync-status">
+    <div id="syncStatus" class="sync-status" onclick="syncNow()">
         <span id="syncIcon">🔄</span>
-        <span id="syncText">Modo local</span>
+        <span id="syncText">Cargando...</span>
     </div>
 
-    <button class="admin-toggle" onclick="requestAdminAccess()">🔧 Admin</button>
+    <button class="admin-toggle" onclick="requestAdminAccess()">Admin</button>
 
     <!-- Modal para contraseña -->
     <div id="passwordModal" class="password-modal">
         <div class="password-content">
-            <h3 style="color: #ff6b6b; margin-bottom: 15px;">🔐 Acceso Administrativo</h3>
+            <h3 style="color: #ff6b6b; margin-bottom: 15px;">Acceso Administrativo</h3>
             <p style="color: #666; margin-bottom: 20px;">Introduce la contraseña para acceder al panel administrativo</p>
             <input type="password" id="passwordInput" class="password-input" placeholder="Contraseña" maxlength="20">
             <div style="margin-top: 20px;">
-                <button class="btn btn-primary" onclick="checkPassword()" style="margin-right: 10px;">✅ Acceder</button>
-                <button class="btn btn-secondary" onclick="closePasswordModal()">❌ Cancelar</button>
+                <button class="btn btn-primary" onclick="checkPassword()" style="margin-right: 10px;">Acceder</button>
+                <button class="btn btn-secondary" onclick="closePasswordModal()">Cancelar</button>
             </div>
             <div id="passwordError" style="color: #dc3545; margin-top: 15px; display: none;">
-                ❌ Contraseña incorrecta
+                Contraseña incorrecta
             </div>
         </div>
     </div>
 
     <div class="container">
-        <!-- Panel de Administración (Oculto por defecto) -->
+        <!-- Panel de Administración -->
         <div id="adminPanel" class="admin-panel">
-            <h2 style="color: #ff6b6b; margin-bottom: 25px;">🔧 Panel de Administración - v3.1</h2>
+            <h2 style="color: #ff6b6b; margin-bottom: 25px;">Panel de Administración - v4.0</h2>
             
-            <!-- Sección para compartir URL -->
-            <div class="share-section">
-                <h3 style="color: #007bff; margin-bottom: 15px;">📤 Compartir Aplicación</h3>
-                <p style="color: #333; margin-bottom: 15px;">
-                    Para sincronizar entre dispositivos, todos deben usar la misma URL. 
-                    Copia esta URL y úsala en todos tus dispositivos:
+            <!-- Configuración de GitHub -->
+            <div class="github-config">
+                <h3 style="color: #24292e; margin-bottom: 15px;">Configuración de Sincronización</h3>
+                <p style="color: #24292e; margin-bottom: 15px;">
+                    Para sincronizar datos entre todos los dispositivos, configura un repositorio de GitHub:
                 </p>
-                <div class="share-url-container">
-                    <input type="text" id="shareUrl" class="share-url-input" readonly>
-                    <button class="copy-btn" onclick="copyShareUrl()">📋 Copiar</button>
+                
+                <div class="config-step">
+                    <h4>Paso 1: Configurar GitHub</h4>
+                    <div class="form-group">
+                        <label for="githubUser">Usuario de GitHub:</label>
+                        <input type="text" id="githubUser" placeholder="tu-usuario" value="">
+                    </div>
+                    <div class="form-group">
+                        <label for="githubRepo">Nombre del Repositorio:</label>
+                        <input type="text" id="githubRepo" placeholder="banquetera-eventos" value="">
+                    </div>
+                    <div class="form-group">
+                        <label for="githubToken">Token de Acceso Personal:</label>
+                        <input type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxx">
+                        <small style="color: #666;">
+                            Crear en: GitHub → Settings → Developer settings → Personal access tokens → Generate new token
+                            <br>Permisos necesarios: repo (Full control of private repositories)
+                        </small>
+                    </div>
+                    <button class="btn btn-github" onclick="configureGitHub()">Configurar GitHub</button>
+                    <button class="btn btn-success" onclick="testConnection()">Probar Conexión</button>
                 </div>
-                <div style="margin-top: 10px; color: #666; font-size: 0.9em;">
-                    💡 Todos los cambios se sincronizarán automáticamente entre dispositivos que usen esta URL
-                </div>
-            </div>
-
-            <!-- Configuración de Sincronización Simple -->
-            <div class="sync-config">
-                <h3 style="color: #155724; margin-bottom: 15px;">✅ Sincronización Simplificada</h3>
-                <p style="color: #155724; margin-bottom: 15px;">
-                    Esta versión usa un sistema de sincronización más confiable basado en la URL. 
-                    Los datos se comparten automáticamente entre dispositivos que usen la misma URL.
-                </p>
-                <div style="display: flex; gap: 10px; margin-top: 15px;">
-                    <button class="btn btn-success" onclick="forceSyncData()">🔄 Forzar Sincronización</button>
-                    <button class="btn btn-secondary" onclick="exportData()">💾 Exportar Datos</button>
-                    <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
-                    <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📂 Importar Datos</button>
+                
+                <div id="githubStatus" style="margin-top: 15px;">
+                    <p><strong>Estado:</strong> <span id="connectionStatus">No configurado</span></p>
+                    <p><strong>URL Pública:</strong> <span id="publicUrl">-</span></p>
                 </div>
             </div>
 
             <div style="background: white; padding: 25px; border-radius: 15px; margin-bottom: 25px;">
-                <h3>📊 Resumen</h3>
+                <h3>Resumen</h3>
                 <p><strong>Total eventos:</strong> <span id="eventCount">0</span></p>
-                <p><strong>Estado sincronización:</strong> <span id="syncStatusText">Activa</span></p>
-                <p><strong>Última actualización:</strong> <span id="lastUpdate">-</span></p>
+                <p><strong>Última sincronización:</strong> <span id="lastSync">-</span></p>
             </div>
 
             <form id="eventForm">
                 <div class="form-group">
-                    <label for="eventCenter">🏛️ Centro de Eventos</label>
+                    <label for="eventCenter">Centro de Eventos</label>
                     <input type="text" id="eventCenter" placeholder="Nombre del centro de eventos" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="eventDate">📅 Fecha del Evento</label>
+                    <label for="eventDate">Fecha del Evento</label>
                     <input type="date" id="eventDate" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="eventTime">⏰ Hora de Inicio</label>
+                    <label for="eventTime">Hora de Inicio</label>
                     <input type="time" id="eventTime" value="19:00" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="guestCount">👥 Número de Invitados</label>
+                    <label for="guestCount">Número de Invitados</label>
                     <input type="number" id="guestCount" placeholder="150" min="1" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="observations">📝 Observaciones</label>
+                    <label for="observations">Observaciones</label>
                     <textarea id="observations" rows="3" placeholder="Observaciones especiales..."></textarea>
                 </div>
 
                 <div class="form-group">
-                    <label>📄 Documentos desde Google Drive</label>
+                    <label>Documentos desde Google Drive</label>
                     <div style="background: #fff3cd; padding: 15px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid #ffc107;">
-                        <h4 style="color: #856404; margin-bottom: 10px;">📋 Instrucciones:</h4>
+                        <h4 style="color: #856404; margin-bottom: 10px;">Instrucciones:</h4>
                         <ol style="color: #856404; margin-left: 20px;">
                             <li>Sube tus PDFs a Google Drive</li>
                             <li>Para cada archivo: Clic derecho → "Compartir" → "Cualquier persona con el enlace"</li>
@@ -811,27 +779,27 @@
                         <div id="driveLinksList">
                             <!-- Enlaces se agregan aquí -->
                         </div>
-                        <button type="button" class="btn btn-primary" onclick="addDriveLink()">➕ Agregar Documento</button>
+                        <button type="button" class="btn btn-primary" onclick="addDriveLink()">Agregar Documento</button>
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary">➕ Crear Evento</button>
+                <button type="submit" class="btn btn-primary">Crear Evento</button>
             </form>
         </div>
 
         <!-- Contenido Principal -->
         <div class="header">
-            <h1>🍽️ Eventos de la Semana</h1>
+            <h1>Eventos de la Semana</h1>
             <p>Selecciona tu evento y después tu rol para ver los documentos</p>
             <div style="font-size: 0.8em; opacity: 0.7; margin-top: 10px;">
-                Versión 3.1 - Sincronización Mejorada
+                Versión 4.0 - Sincronización en Tiempo Real
             </div>
         </div>
 
         <div class="main-content">
             <div class="week-info">
                 <h2 id="currentWeek">Eventos Disponibles</h2>
-                <div class="week-dates" id="weekDates">Mostrando todos los eventos activos</div>
+                <div class="week-dates" id="weekDates">Cargando eventos...</div>
             </div>
 
             <div id="eventsContainer" class="events-grid">
@@ -860,211 +828,286 @@
         let adminPanelVisible = false;
         let isAuthenticated = false;
         let driveLinksCount = 0;
-        let syncKey = '';
+        let githubConfig = {
+            user: localStorage.getItem('github_user') || '',
+            repo: localStorage.getItem('github_repo') || '',
+            token: localStorage.getItem('github_token') || ''
+        };
         
         const ADMIN_PASSWORD = 'Pagoda1234';
-        const STORAGE_KEY = 'banquetera_events_v3';
-        
+
         // Inicializar
         document.addEventListener('DOMContentLoaded', function() {
-            initializeApp();
-        });
-
-        function initializeApp() {
-            // Generar o recuperar clave de sincronización única
-            syncKey = localStorage.getItem('banquetera_sync_key') || generateSyncKey();
-            localStorage.setItem('banquetera_sync_key', syncKey);
-            
-            // Cargar datos
-            loadData();
-            
-            // Configurar URL de compartir
-            setupShareUrl();
-            
-            // Mostrar datos
+            loadGitHubConfig();
+            if (isGitHubConfigured()) {
+                syncFromGitHub();
+                setInterval(syncFromGitHub, 30000); // Sincronizar cada 30 segundos
+            } else {
+                loadLocalData();
+            }
             displayEvents();
             updateAdminInfo();
             setupMobileOptimizations();
-            
-            // Configurar sincronización automática
-            setInterval(syncData, 5000); // Cada 5 segundos
-            
-            // Escuchar cambios en localStorage de otras pestañas/ventanas
-            window.addEventListener('storage', function(e) {
-                if (e.key === STORAGE_KEY + '_' + syncKey) {
-                    loadData();
-                    displayEvents();
-                    updateAdminInfo();
-                    updateSyncStatus('success', '✅ Sincronizado');
-                }
-            });
-            
-            updateSyncStatus('success', '✅ Sistema activo');
+        });
+
+        function loadGitHubConfig() {
+            document.getElementById('githubUser').value = githubConfig.user;
+            document.getElementById('githubRepo').value = githubConfig.repo;
+            if (githubConfig.token) {
+                document.getElementById('githubToken').value = githubConfig.token;
+            }
+            updateConnectionStatus();
         }
 
-        function generateSyncKey() {
-            return 'sync_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now().toString(36);
+        function isGitHubConfigured() {
+            return githubConfig.user && githubConfig.repo && githubConfig.token;
         }
 
-        function setupShareUrl() {
-            const baseUrl = window.location.href.split('?')[0].split('#')[0];
-            const shareUrl = `${baseUrl}?sync=${syncKey}`;
-            document.getElementById('shareUrl').value = shareUrl;
+        function updateConnectionStatus() {
+            const statusEl = document.getElementById('connectionStatus');
+            const urlEl = document.getElementById('publicUrl');
+            const syncEl = document.getElementById('syncStatus');
+            const syncIcon = document.getElementById('syncIcon');
+            const syncText = document.getElementById('syncText');
             
-            // Si hay un parámetro sync en la URL, usarlo
-            const urlParams = new URLSearchParams(window.location.search);
-            const urlSyncKey = urlParams.get('sync');
-            if (urlSyncKey && urlSyncKey !== syncKey) {
-                syncKey = urlSyncKey;
-                localStorage.setItem('banquetera_sync_key', syncKey);
-                setupShareUrl(); // Actualizar URL
-                loadData(); // Cargar datos con nueva clave
+            if (isGitHubConfigured()) {
+                statusEl.textContent = 'Configurado';
+                statusEl.style.color = '#28a745';
+                
+                const repoUrl = `https://github.com/${githubConfig.user}/${githubConfig.repo}`;
+                urlEl.innerHTML = `<a href="${repoUrl}" target="_blank">${repoUrl}</a>`;
+                
+                syncEl.classList.remove('error');
+                syncEl.classList.add('success');
+                syncIcon.textContent = '✅';
+                syncText.textContent = 'Sincronizado';
+            } else {
+                statusEl.textContent = 'No configurado';
+                statusEl.style.color = '#dc3545';
+                urlEl.textContent = '-';
+                
+                syncEl.classList.remove('success');
+                syncEl.classList.add('error');
+                syncIcon.textContent = '❌';
+                syncText.textContent = 'Sin configurar';
             }
         }
 
-        function copyShareUrl() {
-            const shareUrl = document.getElementById('shareUrl');
-            shareUrl.select();
-            document.execCommand('copy');
+        async function configureGitHub() {
+            const user = document.getElementById('githubUser').value.trim();
+            const repo = document.getElementById('githubRepo').value.trim();
+            const token = document.getElementById('githubToken').value.trim();
             
-            const btn = event.target;
-            const originalText = btn.textContent;
-            btn.textContent = '✅ Copiado!';
-            btn.style.background = '#28a745';
-            
-            setTimeout(() => {
-                btn.textContent = originalText;
-                btn.style.background = '#007bff';
-            }, 2000);
-        }
-
-        function setupMobileOptimizations() {
-            if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-                const viewport = document.querySelector('meta[name=viewport]');
-                if (viewport) {
-                    viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
-                }
+            if (!user || !repo || !token) {
+                showMessage('Complete todos los campos de configuración de GitHub', 'error');
+                return;
             }
-            document.addEventListener('touchstart', function() {}, true);
-        }
-
-        function loadData() {
+            
+            githubConfig = { user, repo, token };
+            
+            // Guardar configuración
+            localStorage.setItem('github_user', user);
+            localStorage.setItem('github_repo', repo);
+            localStorage.setItem('github_token', token);
+            
+            updateConnectionStatus();
+            
             try {
-                const storageKey = STORAGE_KEY + '_' + syncKey;
-                const savedData = localStorage.getItem(storageKey);
-                if (savedData) {
-                    events = JSON.parse(savedData);
-                    updateLastUpdate();
-                } else {
-                    // Intentar migrar datos existentes
-                    const oldData = localStorage.getItem('banquetera_events') || 
-                                   localStorage.getItem('banquetera_events_drive');
-                    if (oldData) {
-                        events = JSON.parse(oldData);
-                        saveData(); // Guardar en nueva ubicación
+                await initializeGitHubRepo();
+                showMessage('GitHub configurado correctamente', 'success');
+                syncFromGitHub();
+            } catch (error) {
+                showMessage('Error configurando GitHub: ' + error.message, 'error');
+            }
+        }
+
+        async function testConnection() {
+            if (!isGitHubConfigured()) {
+                showMessage('Configure GitHub primero', 'error');
+                return;
+            }
+            
+            updateSyncStatus('syncing', 'Probando...');
+            
+            try {
+                const response = await fetch(`https://api.github.com/repos/${githubConfig.user}/${githubConfig.repo}`, {
+                    headers: {
+                        'Authorization': `token ${githubConfig.token}`,
+                        'Accept': 'application/vnd.github.v3+json'
                     }
+                });
+                
+                if (response.ok) {
+                    updateSyncStatus('success', 'Conexión exitosa');
+                    showMessage('Conexión con GitHub exitosa', 'success');
+                } else {
+                    throw new Error(`Error HTTP: ${response.status}`);
                 }
             } catch (error) {
-                console.error('Error cargando datos:', error);
+                updateSyncStatus('error', 'Error de conexión');
+                showMessage('Error conectando con GitHub: ' + error.message, 'error');
+            }
+        }
+
+        async function initializeGitHubRepo() {
+            try {
+                // Verificar si el archivo ya existe
+                const checkResponse = await fetch(`https://api.github.com/repos/${githubConfig.user}/${githubConfig.repo}/contents/events.json`, {
+                    headers: {
+                        'Authorization': `token ${githubConfig.token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                
+                if (!checkResponse.ok && checkResponse.status === 404) {
+                    // Crear archivo inicial
+                    const initialData = {
+                        events: events.length > 0 ? events : [],
+                        lastUpdate: new Date().toISOString()
+                    };
+                    
+                    await fetch(`https://api.github.com/repos/${githubConfig.user}/${githubConfig.repo}/contents/events.json`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `token ${githubConfig.token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            message: 'Inicializar archivo de eventos',
+                            content: btoa(JSON.stringify(initialData, null, 2))
+                        })
+                    });
+                }
+            } catch (error) {
+                console.error('Error inicializando repositorio:', error);
+                throw error;
+            }
+        }
+
+        async function syncFromGitHub() {
+            if (!isGitHubConfigured()) return;
+            
+            updateSyncStatus('syncing', 'Sincronizando...');
+            
+            try {
+                const response = await fetch(`https://api.github.com/repos/${githubConfig.user}/${githubConfig.repo}/contents/events.json`, {
+                    headers: {
+                        'Authorization': `token ${githubConfig.token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const content = JSON.parse(atob(data.content));
+                    
+                    if (content.events) {
+                        events = content.events;
+                        displayEvents();
+                        updateAdminInfo();
+                        updateLastSync();
+                    }
+                    
+                    updateSyncStatus('success', 'Sincronizado');
+                } else if (response.status === 404) {
+                    // Archivo no existe, crear uno inicial
+                    await initializeGitHubRepo();
+                    updateSyncStatus('success', 'Inicializado');
+                } else {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+            } catch (error) {
+                console.error('Error sincronizando:', error);
+                updateSyncStatus('error', 'Error sync');
+                loadLocalData(); // Usar datos locales como fallback
+            }
+        }
+
+        async function syncToGitHub() {
+            if (!isGitHubConfigured()) {
+                saveLocalData();
+                return;
+            }
+            
+            updateSyncStatus('syncing', 'Guardando...');
+            
+            try {
+                // Obtener SHA actual del archivo
+                const getResponse = await fetch(`https://api.github.com/repos/${githubConfig.user}/${githubConfig.repo}/contents/events.json`, {
+                    headers: {
+                        'Authorization': `token ${githubConfig.token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                
+                let sha = null;
+                if (getResponse.ok) {
+                    const currentFile = await getResponse.json();
+                    sha = currentFile.sha;
+                }
+                
+                // Actualizar archivo
+                const updateData = {
+                    events: events,
+                    lastUpdate: new Date().toISOString()
+                };
+                
+                const updateResponse = await fetch(`https://api.github.com/repos/${githubConfig.user}/${githubConfig.repo}/contents/events.json`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${githubConfig.token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: `Actualizar eventos - ${new Date().toLocaleString('es-ES')}`,
+                        content: btoa(JSON.stringify(updateData, null, 2)),
+                        sha: sha
+                    })
+                });
+                
+                if (updateResponse.ok) {
+                    updateSyncStatus('success', 'Guardado');
+                    updateLastSync();
+                } else {
+                    throw new Error(`Error actualizando: ${updateResponse.status}`);
+                }
+                
+            } catch (error) {
+                console.error('Error guardando en GitHub:', error);
+                updateSyncStatus('error', 'Error guardando');
+                saveLocalData(); // Guardar localmente como fallback
+            }
+        }
+
+        function loadLocalData() {
+            try {
+                const savedData = localStorage.getItem('banquetera_events_v4');
+                if (savedData) {
+                    events = JSON.parse(savedData);
+                }
+            } catch (error) {
+                console.error('Error cargando datos locales:', error);
                 events = [];
             }
         }
 
-        function saveData() {
+        function saveLocalData() {
             try {
-                const storageKey = STORAGE_KEY + '_' + syncKey;
-                localStorage.setItem(storageKey, JSON.stringify(events));
-                updateLastUpdate();
-                updateSyncStatus('success', '✅ Guardado');
+                localStorage.setItem('banquetera_events_v4', JSON.stringify(events));
             } catch (error) {
-                console.error('Error guardando datos:', error);
-                updateSyncStatus('error', '❌ Error guardando');
+                console.error('Error guardando datos locales:', error);
             }
         }
 
-        function syncData() {
-            // Esta función sincroniza automáticamente entre pestañas/ventanas
-            // del mismo navegador usando localStorage events
-            updateSyncStatus('success', '✅ Sincronizado');
-        }
-
-        function forceSyncData() {
-            updateSyncStatus('syncing', '🔄 Forzando sync...');
-            
-            // Disparar evento de sincronización manual
-            const storageKey = STORAGE_KEY + '_' + syncKey;
-            const currentData = localStorage.getItem(storageKey);
-            
-            // Re-guardar para disparar evento storage en otras ventanas
-            localStorage.removeItem(storageKey);
-            setTimeout(() => {
-                localStorage.setItem(storageKey, currentData || '[]');
-                updateSyncStatus('success', '✅ Sincronización forzada');
-                showMessage('Sincronización forzada completada', 'success');
-            }, 100);
-        }
-
-        function exportData() {
-            try {
-                const dataStr = JSON.stringify(events, null, 2);
-                const dataBlob = new Blob([dataStr], {type: 'application/json'});
-                
-                const url = URL.createObjectURL(dataBlob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `banquetera-eventos-${new Date().toISOString().split('T')[0]}.json`;
-                link.click();
-                
-                URL.revokeObjectURL(url);
-                showMessage('Datos exportados correctamente', 'success');
-            } catch (error) {
-                console.error('Error exportando:', error);
-                showMessage('Error al exportar datos', 'error');
-            }
-        }
-
-        function importData(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const importedEvents = JSON.parse(e.target.result);
-                    if (Array.isArray(importedEvents)) {
-                        // Combinar eventos, evitando duplicados por ID
-                        const existingIds = new Set(events.map(e => e.id));
-                        const newEvents = importedEvents.filter(e => !existingIds.has(e.id));
-                        
-                        events = [...events, ...newEvents];
-                        saveData();
-                        displayEvents();
-                        updateAdminInfo();
-                        
-                        showMessage(`Importados ${newEvents.length} eventos nuevos`, 'success');
-                    } else {
-                        throw new Error('Formato de archivo inválido');
-                    }
-                } catch (error) {
-                    console.error('Error importando:', error);
-                    showMessage('Error al importar datos. Verifica el formato del archivo.', 'error');
-                }
-            };
-            reader.readAsText(file);
-            
-            // Limpiar input
-            event.target.value = '';
-        }
-
-        function updateLastUpdate() {
+        function updateLastSync() {
             const now = new Date();
             const timeStr = now.toLocaleTimeString('es-ES', {
                 hour: '2-digit',
                 minute: '2-digit'
             });
-            const lastUpdateEl = document.getElementById('lastUpdate');
-            if (lastUpdateEl) {
-                lastUpdateEl.textContent = timeStr;
+            const lastSyncEl = document.getElementById('lastSync');
+            if (lastSyncEl) {
+                lastSyncEl.textContent = timeStr;
             }
         }
 
@@ -1076,26 +1119,39 @@
             // Limpiar clases anteriores
             statusEl.classList.remove('syncing', 'error', 'success');
             
-            // Aplicar nueva clase y contenido
+            // Aplicar nueva clase
             if (status !== 'default') {
                 statusEl.classList.add(status);
             }
             
-            if (iconEl) iconEl.textContent = text.split(' ')[0];
-            if (textEl) textEl.textContent = text.substring(2);
+            // Actualizar contenido
+            const icons = {
+                syncing: '🔄',
+                success: '✅',
+                error: '❌',
+                default: '📱'
+            };
             
-            // Actualizar texto en panel admin
-            const syncStatusText = document.getElementById('syncStatusText');
-            if (syncStatusText) {
-                let statusText = 'Activa';
-                switch(status) {
-                    case 'syncing': statusText = 'Sincronizando...'; break;
-                    case 'success': statusText = 'Activa'; break;
-                    case 'error': statusText = 'Error'; break;
-                    default: statusText = 'Activa'; break;
-                }
-                syncStatusText.textContent = statusText;
+            if (iconEl) iconEl.textContent = icons[status] || '📱';
+            if (textEl) textEl.textContent = text;
+        }
+
+        function syncNow() {
+            if (isGitHubConfigured()) {
+                syncFromGitHub();
+            } else {
+                showMessage('Configure GitHub para sincronizar', 'error');
             }
+        }
+
+        function setupMobileOptimizations() {
+            if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+                const viewport = document.querySelector('meta[name=viewport]');
+                if (viewport) {
+                    viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+                }
+            }
+            document.addEventListener('touchstart', function() {}, true);
         }
 
         // Funciones para autenticación
@@ -1213,7 +1269,7 @@
         }
 
         // Manejar envío del formulario
-        document.getElementById('eventForm').addEventListener('submit', function(e) {
+        document.getElementById('eventForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             // Recopilar enlaces de Drive
@@ -1261,9 +1317,11 @@
             };
 
             events.push(event);
-            saveData();
+            
+            // Sincronizar con GitHub
+            await syncToGitHub();
 
-            showMessage('Evento creado correctamente!');
+            showMessage('Evento creado y sincronizado correctamente!');
             
             // Limpiar formulario
             this.reset();
@@ -1277,22 +1335,26 @@
 
         function displayEvents() {
             const container = document.getElementById('eventsContainer');
+            const weekDatesEl = document.getElementById('weekDates');
             
             container.innerHTML = '';
 
             if (events.length === 0) {
+                weekDatesEl.textContent = 'No hay eventos programados';
                 container.innerHTML = `
                     <div class="empty-state">
                         <div class="emoji">📅</div>
                         <h3>No hay eventos programados</h3>
-                        <p>Los eventos aparecerán aquí cuando sean cargados desde el panel administrativo</p>
+                        <p>Los eventos aparecerán aquí cuando sean creados desde el panel administrativo</p>
                         <p style="margin-top: 15px; font-size: 0.9em; color: #999;">
-                            <strong>Tip:</strong> Usa el botón "Admin" para crear eventos con enlaces de Google Drive
+                            Tip: Usa el botón "Admin" para crear eventos con enlaces de Google Drive
                         </p>
                     </div>
                 `;
                 return;
             }
+
+            weekDatesEl.textContent = `${events.length} eventos disponibles`;
 
             const eventsByDate = groupEventsByDate(events);
             
