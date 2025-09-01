@@ -621,6 +621,23 @@
             <div style="background: white; padding: 25px; border-radius: 15px; margin-bottom: 25px;">
                 <h3>📊 Resumen</h3>
                 <p><strong>Total eventos:</strong> <span id="eventCount">0</span></p>
+                <div style="margin-top: 15px;">
+                    <button type="button" class="btn btn-primary" onclick="generateSyncLink()" style="margin-right: 10px;">🔗 Generar Link de Sincronización</button>
+                    <button type="button" class="btn btn-secondary" onclick="exportEvents()">📤 Exportar Datos</button>
+                </div>
+                <div id="syncLinkContainer" style="margin-top: 15px; display: none;">
+                    <h4>📱 Link para Móviles:</h4>
+                    <input type="text" id="syncLinkInput" readonly style="width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 5px;">
+                    <button class="btn btn-success" onclick="copySyncLink()">📋 Copiar Link</button>
+                    <p style="font-size: 0.9em; color: #666; margin-top: 10px;">
+                        Envía este link por WhatsApp. Al abrirlo, los móviles se sincronizarán automáticamente.
+                    </p>
+                </div>
+            </div>
+
+            <div id="editEventContainer" style="display: none;" class="edit-mode">
+                <h3 style="color: #856404; margin-bottom: 20px;">✏️ Editando Evento</h3>
+                <button type="button" class="btn btn-secondary" onclick="cancelEdit()">❌ Cancelar Edición</button>
             </div>
 
             <form id="eventForm">
@@ -670,8 +687,13 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary">➕ Crear Evento</button>
+                <button type="submit" class="btn btn-primary" id="submitBtn">➕ Crear Evento</button>
             </form>
+
+            <div class="events-admin" style="margin-top: 30px;">
+                <h3>📋 Eventos Creados</h3>
+                <div id="adminEventsList"></div>
+            </div>
         </div>
 
         <!-- Contenido Principal -->
@@ -716,16 +738,108 @@
         let adminPanelVisible = false;
         let isAuthenticated = false;
         let driveLinksCount = 0;
+        let editingEventId = null;
         const ADMIN_PASSWORD = 'Pagoda1234';
 
         // Inicializar
         document.addEventListener('DOMContentLoaded', function() {
-            // Migrar datos si existen en el almacenamiento antiguo
+            checkForSyncData(); // Verificar sincronización desde URL
             migrateOldData();
             displayEvents();
             updateAdminInfo();
             setupMobileOptimizations();
         });
+
+        // Verificar datos de sincronización en la URL
+        function checkForSyncData() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const syncData = urlParams.get('sync');
+            
+            if (syncData) {
+                try {
+                    const decodedData = atob(syncData);
+                    const importedEvents = JSON.parse(decodedData);
+                    
+                    if (importedEvents && importedEvents.length > 0) {
+                        if (confirm(`📱 Se han detectado ${importedEvents.length} eventos para sincronizar.\n\n¿Deseas cargar estos eventos en este dispositivo?`)) {
+                            events = importedEvents;
+                            localStorage.setItem('banquetera_events', JSON.stringify(events));
+                            
+                            window.history.replaceState({}, document.title, window.location.pathname);
+                            
+                            setTimeout(() => {
+                                alert('✅ ¡Eventos sincronizados correctamente!\n\nYa puedes ver todos los eventos en este dispositivo.');
+                                location.reload();
+                            }, 500);
+                        } else {
+                            window.history.replaceState({}, document.title, window.location.pathname);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error al procesar datos de sincronización:', error);
+                    alert('❌ Error al sincronizar datos. El link puede estar corrupto.');
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+            }
+        }
+
+        function generateSyncLink() {
+            if (events.length === 0) {
+                alert('⚠️ No hay eventos para sincronizar. Crea algunos eventos primero.');
+                return;
+            }
+            
+            try {
+                const dataString = JSON.stringify(events);
+                const encodedData = btoa(dataString);
+                const currentUrl = window.location.origin + window.location.pathname;
+                const shareUrl = `${currentUrl}?sync=${encodedData}`;
+                
+                document.getElementById('syncLinkInput').value = shareUrl;
+                document.getElementById('syncLinkContainer').style.display = 'block';
+                
+                showMessage(`🔗 Link de sincronización generado con ${events.length} eventos`);
+            } catch (error) {
+                console.error('Error generando link:', error);
+                alert('❌ Error generando link. Los datos pueden ser muy grandes.');
+            }
+        }
+
+        function copySyncLink() {
+            const linkInput = document.getElementById('syncLinkInput');
+            linkInput.select();
+            linkInput.setSelectionRange(0, 99999);
+            
+            try {
+                document.execCommand('copy');
+                showMessage('📋 Link copiado al portapapeles');
+                
+                if (navigator.share && /Android|iPhone|iPad/i.test(navigator.userAgent)) {
+                    navigator.share({
+                        title: 'Eventos Banquetera',
+                        text: 'Link para sincronizar eventos',
+                        url: linkInput.value
+                    });
+                }
+            } catch (err) {
+                console.log('Error copiando:', err);
+                linkInput.focus();
+                linkInput.select();
+                alert('📋 Selecciona y copia manualmente el link que aparece seleccionado');
+            }
+        }
+
+        function exportEvents() {
+            const dataStr = JSON.stringify(events, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `eventos_banquetera_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            
+            showMessage('📤 Datos exportados correctamente');
+        }
 
         function migrateOldData() {
             // Verificar si hay datos en el almacenamiento antiguo
@@ -820,6 +934,7 @@
                 toggleBtn.textContent = '❌ Cerrar Admin';
                 toggleBtn.style.background = 'rgba(220, 53, 69, 0.9)';
                 toggleBtn.style.color = 'white';
+                updateAdminEventsList();
             } else {
                 panel.classList.remove('active');
                 toggleBtn.textContent = '🔧 Admin';
@@ -911,30 +1026,193 @@
                 return;
             }
             
-            const event = {
-                id: Date.now(),
-                center: document.getElementById('eventCenter').value,
-                date: document.getElementById('eventDate').value,
-                time: document.getElementById('eventTime').value,
-                guestCount: document.getElementById('guestCount').value,
-                observations: document.getElementById('observations').value,
-                documents: driveLinks,
-                created: new Date().toISOString()
-            };
+            if (editingEventId) {
+                // Actualizar evento existente
+                const eventIndex = events.findIndex(e => e.id === editingEventId);
+                if (eventIndex >= 0) {
+                    events[eventIndex] = {
+                        ...events[eventIndex],
+                        center: document.getElementById('eventCenter').value,
+                        date: document.getElementById('eventDate').value,
+                        time: document.getElementById('eventTime').value,
+                        guestCount: document.getElementById('guestCount').value,
+                        observations: document.getElementById('observations').value,
+                        documents: driveLinks,
+                        updated: new Date().toISOString()
+                    };
+                    showMessage('✅ ¡Evento actualizado correctamente!');
+                    cancelEdit();
+                }
+            } else {
+                // Crear nuevo evento
+                const event = {
+                    id: Date.now(),
+                    center: document.getElementById('eventCenter').value,
+                    date: document.getElementById('eventDate').value,
+                    time: document.getElementById('eventTime').value,
+                    guestCount: document.getElementById('guestCount').value,
+                    observations: document.getElementById('observations').value,
+                    documents: driveLinks,
+                    created: new Date().toISOString()
+                };
+                
+                events.push(event);
+                showMessage('✅ ¡Evento creado correctamente con documentos de Google Drive!');
+                
+                // Limpiar formulario
+                this.reset();
+                document.getElementById('driveLinksList').innerHTML = '';
+                driveLinksCount = 0;
+            }
 
-            events.push(event);
             localStorage.setItem('banquetera_events', JSON.stringify(events));
-
-            showMessage('✅ ¡Evento creado correctamente con documentos de Google Drive!');
-            
-            // Limpiar formulario
-            this.reset();
-            document.getElementById('driveLinksList').innerHTML = '';
-            driveLinksCount = 0;
             
             // Actualizar vistas
             displayEvents();
             updateAdminInfo();
+            updateAdminEventsList();
+        });
+
+        function editEvent(eventId) {
+            const event = events.find(e => e.id === eventId);
+            if (!event) return;
+
+            editingEventId = eventId;
+            
+            // Mostrar indicador de modo edición
+            document.getElementById('editEventContainer').style.display = 'block';
+            
+            // Llenar formulario con datos existentes
+            document.getElementById('eventCenter').value = event.center;
+            document.getElementById('eventDate').value = event.date;
+            document.getElementById('eventTime').value = event.time;
+            document.getElementById('guestCount').value = event.guestCount;
+            document.getElementById('observations').value = event.observations || '';
+            
+            // Cargar documentos existentes
+            document.getElementById('driveLinksList').innerHTML = '';
+            driveLinksCount = 0;
+            
+            if (event.documents && event.documents.length > 0) {
+                event.documents.forEach(doc => {
+                    addDriveLink();
+                    const lastItem = document.querySelector('#driveLinksList > div:last-child');
+                    if (lastItem) {
+                        lastItem.querySelector('input[type="text"]').value = doc.name;
+                        lastItem.querySelector('input[type="url"]').value = doc.originalUrl || doc.url;
+                        doc.roles.forEach(role => {
+                            const checkbox = lastItem.querySelector(`input[value="${role}"]`);
+                            if (checkbox) checkbox.checked = true;
+                        });
+                    }
+                });
+            }
+
+            // Cambiar texto del botón
+            document.getElementById('submitBtn').textContent = '💾 Actualizar Evento';
+            
+            // Hacer scroll al formulario
+            document.getElementById('eventForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function cancelEdit() {
+            editingEventId = null;
+            document.getElementById('editEventContainer').style.display = 'none';
+            document.getElementById('submitBtn').textContent = '➕ Crear Evento';
+            
+            // Limpiar formulario
+            document.getElementById('eventForm').reset();
+            document.getElementById('driveLinksList').innerHTML = '';
+            driveLinksCount = 0;
+        }
+
+        function deleteEvent(eventId) {
+            const event = events.find(e => e.id === eventId);
+            if (!event) return;
+            
+            if (confirm(`⚠️ ¿Eliminar el evento "${event.center}" del ${formatDate(event.date)}?\n\nSe eliminarán todos los documentos asociados.`)) {
+                events = events.filter(e => e.id !== eventId);
+                localStorage.setItem('banquetera_events', JSON.stringify(events));
+                
+                // Si estábamos editando este evento, cancelar edición
+                if (editingEventId === eventId) {
+                    cancelEdit();
+                }
+                
+                displayEvents();
+                updateAdminInfo();
+                updateAdminEventsList();
+                showMessage('✅ Evento eliminado correctamente');
+            }
+        }
+
+        function updateAdminEventsList() {
+            const container = document.getElementById('adminEventsList');
+            
+            if (events.length === 0) {
+                container.innerHTML = '<p style="color: #666; text-align: center;">No hay eventos creados aún</p>';
+                return;
+            }
+
+            const sortedEvents = [...events].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            container.innerHTML = '';
+            sortedEvents.forEach(event => {
+                const eventDiv = document.createElement('div');
+                eventDiv.style.cssText = `
+                    background: white; 
+                    border: 2px solid #e9ecef; 
+                    border-radius: 15px; 
+                    padding: 20px; 
+                    margin-bottom: 20px;
+                `;
+                
+                const eventDate = new Date(event.date + 'T00:00:00');
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                const isToday = eventDate.toDateString() === today.toDateString();
+                const isPast = eventDate < today;
+                
+                let dateClass = '';
+                let datePrefix = '';
+                if (isToday) {
+                    dateClass = 'color: #ff6b6b; font-weight: bold;';
+                    datePrefix = 'HOY - ';
+                } else if (isPast) {
+                    dateClass = 'color: #999;';
+                    datePrefix = 'PASADO - ';
+                }
+
+                let formattedDate;
+                try {
+                    formattedDate = formatDate(event.date);
+                } catch (e) {
+                    formattedDate = event.date;
+                }
+
+                eventDiv.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <div>
+                            <h4 style="color: #ff6b6b; margin-bottom: 5px;">${event.center}</h4>
+                            <p style="${dateClass}">📅 ${datePrefix}${formattedDate} - ⏰ ${event.time}</p>
+                            <p>👥 ${event.guestCount} invitados</p>
+                            ${event.observations ? `<p style="font-style: italic; color: #666;">💬 ${event.observations}</p>` : ''}
+                            <p style="color: #666; font-size: 0.9em;">📄 ${event.documents ? event.documents.length : 0} documentos</p>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <button onclick="editEvent(${event.id})" style="background: #ffc107; color: black; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                                ✏️ Editar
+                            </button>
+                            <button onclick="deleteEvent(${event.id})" style="background: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                                🗑️ Eliminar
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(eventDiv);
+            });
+        }
         });
 
         function displayEvents() {
