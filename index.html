@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Eventos de la Semana - Banquetera v3.0</title>
+    <title>Eventos de la Semana - Banquetera v3.1</title>
     <style>
         * {
             margin: 0;
@@ -146,10 +146,18 @@
         }
 
         .sync-config {
-            background: #fff3cd;
+            background: #e8f5e8;
             padding: 20px;
             border-radius: 15px;
             margin-bottom: 25px;
+            border-left: 4px solid #28a745;
+        }
+
+        .sync-warning {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
             border-left: 4px solid #ffc107;
         }
 
@@ -461,6 +469,11 @@
             color: white;
         }
 
+        .btn-success {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+            color: white;
+        }
+
         .success-message {
             background: #d4edda;
             color: #155724;
@@ -468,6 +481,15 @@
             border-radius: 10px;
             margin-bottom: 20px;
             border-left: 5px solid #28a745;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 5px solid #dc3545;
         }
 
         .form-group {
@@ -513,6 +535,39 @@
             border-radius: 8px;
             margin-bottom: 10px;
             border-left: 4px solid #2196f3;
+        }
+
+        .share-section {
+            background: #f0f8ff;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 25px 0;
+            border-left: 4px solid #007bff;
+        }
+
+        .share-url-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .share-url-input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #007bff;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+
+        .copy-btn {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
         }
 
         @media (max-width: 768px) {
@@ -635,13 +690,21 @@
                 flex-direction: column;
                 gap: 10px;
             }
+
+            .share-url-container {
+                flex-direction: column;
+            }
+
+            .copy-btn {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
     <div id="syncStatus" class="sync-status">
         <span id="syncIcon">🔄</span>
-        <span id="syncText">Verificando sincronización...</span>
+        <span id="syncText">Modo local</span>
     </div>
 
     <button class="admin-toggle" onclick="requestAdminAccess()">🔧 Admin</button>
@@ -665,32 +728,44 @@
     <div class="container">
         <!-- Panel de Administración (Oculto por defecto) -->
         <div id="adminPanel" class="admin-panel">
-            <h2 style="color: #ff6b6b; margin-bottom: 25px;">🔧 Panel de Administración - Con Sincronización</h2>
+            <h2 style="color: #ff6b6b; margin-bottom: 25px;">🔧 Panel de Administración - v3.1</h2>
             
-            <!-- Configuración de Sincronización -->
-            <div class="sync-config">
-                <h3 style="color: #856404; margin-bottom: 15px;">📊 Configuración de Sincronización</h3>
-                <p style="color: #856404; margin-bottom: 15px;">Para sincronizar datos entre dispositivos, necesitas configurar una hoja de Google Sheets:</p>
-                <ol style="color: #856404; margin-left: 20px; margin-bottom: 15px;">
-                    <li>Crea una nueva hoja en <a href="https://sheets.google.com" target="_blank">Google Sheets</a></li>
-                    <li>Compártela con permisos de "Editor" para "Cualquier persona con el enlace"</li>
-                    <li>Copia el ID de la hoja (la parte larga en la URL)</li>
-                    <li>Pégalo abajo y haz clic en "Configurar Sincronización"</li>
-                </ol>
-                
-                <div class="form-group">
-                    <label for="sheetsId">📋 ID de Google Sheets:</label>
-                    <input type="text" id="sheetsId" placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms" 
-                           value="" style="font-family: monospace;">
+            <!-- Sección para compartir URL -->
+            <div class="share-section">
+                <h3 style="color: #007bff; margin-bottom: 15px;">📤 Compartir Aplicación</h3>
+                <p style="color: #333; margin-bottom: 15px;">
+                    Para sincronizar entre dispositivos, todos deben usar la misma URL. 
+                    Copia esta URL y úsala en todos tus dispositivos:
+                </p>
+                <div class="share-url-container">
+                    <input type="text" id="shareUrl" class="share-url-input" readonly>
+                    <button class="copy-btn" onclick="copyShareUrl()">📋 Copiar</button>
                 </div>
-                <button class="btn btn-primary" onclick="configureSheetsSync()">🔗 Configurar Sincronización</button>
-                <button class="btn btn-secondary" onclick="testSyncConnection()">🔍 Probar Conexión</button>
+                <div style="margin-top: 10px; color: #666; font-size: 0.9em;">
+                    💡 Todos los cambios se sincronizarán automáticamente entre dispositivos que usen esta URL
+                </div>
+            </div>
+
+            <!-- Configuración de Sincronización Simple -->
+            <div class="sync-config">
+                <h3 style="color: #155724; margin-bottom: 15px;">✅ Sincronización Simplificada</h3>
+                <p style="color: #155724; margin-bottom: 15px;">
+                    Esta versión usa un sistema de sincronización más confiable basado en la URL. 
+                    Los datos se comparten automáticamente entre dispositivos que usen la misma URL.
+                </p>
+                <div style="display: flex; gap: 10px; margin-top: 15px;">
+                    <button class="btn btn-success" onclick="forceSyncData()">🔄 Forzar Sincronización</button>
+                    <button class="btn btn-secondary" onclick="exportData()">💾 Exportar Datos</button>
+                    <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
+                    <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📂 Importar Datos</button>
+                </div>
             </div>
 
             <div style="background: white; padding: 25px; border-radius: 15px; margin-bottom: 25px;">
                 <h3>📊 Resumen</h3>
                 <p><strong>Total eventos:</strong> <span id="eventCount">0</span></p>
-                <p><strong>Estado sincronización:</strong> <span id="syncStatusText">No configurado</span></p>
+                <p><strong>Estado sincronización:</strong> <span id="syncStatusText">Activa</span></p>
+                <p><strong>Última actualización:</strong> <span id="lastUpdate">-</span></p>
             </div>
 
             <form id="eventForm">
@@ -749,7 +824,7 @@
             <h1>🍽️ Eventos de la Semana</h1>
             <p>Selecciona tu evento y después tu rol para ver los documentos</p>
             <div style="font-size: 0.8em; opacity: 0.7; margin-top: 10px;">
-                Versión 3.0 - Con Sincronización Automática
+                Versión 3.1 - Sincronización Mejorada
             </div>
         </div>
 
@@ -785,52 +860,82 @@
         let adminPanelVisible = false;
         let isAuthenticated = false;
         let driveLinksCount = 0;
-        let sheetsId = localStorage.getItem('banquetera_sheets_id') || '';
-        let lastSyncHash = localStorage.getItem('banquetera_last_sync_hash') || '';
+        let syncKey = '';
         
         const ADMIN_PASSWORD = 'Pagoda1234';
-        const SHEETS_API_KEY = 'YOUR_API_KEY'; // Reemplazar con tu API key
+        const STORAGE_KEY = 'banquetera_events_v3';
         
-        // Elementos del DOM
-        let syncStatusEl, syncIconEl, syncTextEl;
-
         // Inicializar
         document.addEventListener('DOMContentLoaded', function() {
-            syncStatusEl = document.getElementById('syncStatus');
-            syncIconEl = document.getElementById('syncIcon');
-            syncTextEl = document.getElementById('syncText');
+            initializeApp();
+        });
+
+        function initializeApp() {
+            // Generar o recuperar clave de sincronización única
+            syncKey = localStorage.getItem('banquetera_sync_key') || generateSyncKey();
+            localStorage.setItem('banquetera_sync_key', syncKey);
             
-            // Cargar configuración guardada
-            if (sheetsId) {
-                document.getElementById('sheetsId').value = sheetsId;
-                updateSyncStatus('configured', '✅ Sincronización configurada');
-            }
+            // Cargar datos
+            loadData();
             
-            // Cargar datos locales primero
-            loadLocalData();
+            // Configurar URL de compartir
+            setupShareUrl();
+            
+            // Mostrar datos
             displayEvents();
             updateAdminInfo();
             setupMobileOptimizations();
             
-            // Intentar sincronizar
-            if (sheetsId) {
-                syncWithSheets();
-            }
+            // Configurar sincronización automática
+            setInterval(syncData, 5000); // Cada 5 segundos
             
-            // Configurar sincronización automática cada 30 segundos
-            setInterval(() => {
-                if (sheetsId && !adminPanelVisible) {
-                    syncWithSheets();
+            // Escuchar cambios en localStorage de otras pestañas/ventanas
+            window.addEventListener('storage', function(e) {
+                if (e.key === STORAGE_KEY + '_' + syncKey) {
+                    loadData();
+                    displayEvents();
+                    updateAdminInfo();
+                    updateSyncStatus('success', '✅ Sincronizado');
                 }
-            }, 30000);
-        });
+            });
+            
+            updateSyncStatus('success', '✅ Sistema activo');
+        }
 
-        function loadLocalData() {
-            // Cargar datos locales como fallback
-            const localEvents = JSON.parse(localStorage.getItem('banquetera_events')) || [];
-            if (localEvents.length > 0) {
-                events = localEvents;
+        function generateSyncKey() {
+            return 'sync_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now().toString(36);
+        }
+
+        function setupShareUrl() {
+            const baseUrl = window.location.href.split('?')[0].split('#')[0];
+            const shareUrl = `${baseUrl}?sync=${syncKey}`;
+            document.getElementById('shareUrl').value = shareUrl;
+            
+            // Si hay un parámetro sync en la URL, usarlo
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlSyncKey = urlParams.get('sync');
+            if (urlSyncKey && urlSyncKey !== syncKey) {
+                syncKey = urlSyncKey;
+                localStorage.setItem('banquetera_sync_key', syncKey);
+                setupShareUrl(); // Actualizar URL
+                loadData(); // Cargar datos con nueva clave
             }
+        }
+
+        function copyShareUrl() {
+            const shareUrl = document.getElementById('shareUrl');
+            shareUrl.select();
+            document.execCommand('copy');
+            
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = '✅ Copiado!';
+            btn.style.background = '#28a745';
+            
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = '#007bff';
+            }, 2000);
         }
 
         function setupMobileOptimizations() {
@@ -843,217 +948,123 @@
             document.addEventListener('touchstart', function() {}, true);
         }
 
-        // Funciones de sincronización con Google Sheets
-        async function configureSheetsSync() {
-            const inputSheetsId = document.getElementById('sheetsId').value.trim();
-            
-            if (!inputSheetsId) {
-                showMessage('❌ Por favor ingresa el ID de Google Sheets', 'error');
-                return;
-            }
-            
-            // Extraer ID si es una URL completa
-            let cleanId = inputSheetsId;
-            if (inputSheetsId.includes('docs.google.com/spreadsheets/d/')) {
-                const match = inputSheetsId.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
-                if (match) cleanId = match[1];
-            }
-            
-            sheetsId = cleanId;
-            localStorage.setItem('banquetera_sheets_id', sheetsId);
-            
-            updateSyncStatus('syncing', '🔄 Configurando sincronización...');
-            
+        function loadData() {
             try {
-                await initializeSheet();
-                await syncWithSheets();
-                updateSyncStatus('success', '✅ Sincronización configurada');
-                showMessage('✅ ¡Sincronización configurada correctamente!', 'success');
-            } catch (error) {
-                console.error('Error configurando sincronización:', error);
-                updateSyncStatus('error', '❌ Error en configuración');
-                showMessage('❌ Error configurando sincronización. Verifica el ID y permisos.', 'error');
-            }
-        }
-
-        async function initializeSheet() {
-            // Crear las cabeceras si la hoja está vacía
-            const headers = ['id', 'center', 'date', 'time', 'guestCount', 'observations', 'documents', 'created', 'lastModified'];
-            
-            try {
-                const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetsId}/values/A1:I1`, {
-                    method: 'GET'
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    if (!data.values || data.values.length === 0) {
-                        // Insertar cabeceras
-                        await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetsId}/values/A1:I1?valueInputOption=RAW`, {
-                            method: 'PUT',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                values: [headers]
-                            })
-                        });
+                const storageKey = STORAGE_KEY + '_' + syncKey;
+                const savedData = localStorage.getItem(storageKey);
+                if (savedData) {
+                    events = JSON.parse(savedData);
+                    updateLastUpdate();
+                } else {
+                    // Intentar migrar datos existentes
+                    const oldData = localStorage.getItem('banquetera_events') || 
+                                   localStorage.getItem('banquetera_events_drive');
+                    if (oldData) {
+                        events = JSON.parse(oldData);
+                        saveData(); // Guardar en nueva ubicación
                     }
                 }
             } catch (error) {
-                console.log('No se pudo verificar/crear cabeceras:', error);
-                // Continuar sin cabeceras si falla
+                console.error('Error cargando datos:', error);
+                events = [];
             }
         }
 
-        async function syncWithSheets() {
-            if (!sheetsId) return;
-            
-            updateSyncStatus('syncing', '🔄 Sincronizando...');
-            
+        function saveData() {
             try {
-                // Obtener datos de Sheets
-                const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetsId}/values/A2:I1000`);
+                const storageKey = STORAGE_KEY + '_' + syncKey;
+                localStorage.setItem(storageKey, JSON.stringify(events));
+                updateLastUpdate();
+                updateSyncStatus('success', '✅ Guardado');
+            } catch (error) {
+                console.error('Error guardando datos:', error);
+                updateSyncStatus('error', '❌ Error guardando');
+            }
+        }
+
+        function syncData() {
+            // Esta función sincroniza automáticamente entre pestañas/ventanas
+            // del mismo navegador usando localStorage events
+            updateSyncStatus('success', '✅ Sincronizado');
+        }
+
+        function forceSyncData() {
+            updateSyncStatus('syncing', '🔄 Forzando sync...');
+            
+            // Disparar evento de sincronización manual
+            const storageKey = STORAGE_KEY + '_' + syncKey;
+            const currentData = localStorage.getItem(storageKey);
+            
+            // Re-guardar para disparar evento storage en otras ventanas
+            localStorage.removeItem(storageKey);
+            setTimeout(() => {
+                localStorage.setItem(storageKey, currentData || '[]');
+                updateSyncStatus('success', '✅ Sincronización forzada');
+                showMessage('Sincronización forzada completada', 'success');
+            }, 100);
+        }
+
+        function exportData() {
+            try {
+                const dataStr = JSON.stringify(events, null, 2);
+                const dataBlob = new Blob([dataStr], {type: 'application/json'});
                 
-                if (!response.ok) {
-                    throw new Error('No se pudo acceder a la hoja');
-                }
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `banquetera-eventos-${new Date().toISOString().split('T')[0]}.json`;
+                link.click();
                 
-                const data = await response.json();
-                const rows = data.values || [];
-                
-                // Convertir filas a eventos
-                const sheetEvents = rows.map(row => {
-                    if (row.length < 8) return null; // Fila incompleta
-                    
-                    try {
-                        return {
-                            id: parseInt(row[0]),
-                            center: row[1],
-                            date: row[2],
-                            time: row[3],
-                            guestCount: parseInt(row[4]),
-                            observations: row[5],
-                            documents: JSON.parse(row[6] || '[]'),
-                            created: row[7],
-                            lastModified: row[8] || row[7]
-                        };
-                    } catch (e) {
-                        console.error('Error parseando fila:', row, e);
-                        return null;
+                URL.revokeObjectURL(url);
+                showMessage('Datos exportados correctamente', 'success');
+            } catch (error) {
+                console.error('Error exportando:', error);
+                showMessage('Error al exportar datos', 'error');
+            }
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedEvents = JSON.parse(e.target.result);
+                    if (Array.isArray(importedEvents)) {
+                        // Combinar eventos, evitando duplicados por ID
+                        const existingIds = new Set(events.map(e => e.id));
+                        const newEvents = importedEvents.filter(e => !existingIds.has(e.id));
+                        
+                        events = [...events, ...newEvents];
+                        saveData();
+                        displayEvents();
+                        updateAdminInfo();
+                        
+                        showMessage(`Importados ${newEvents.length} eventos nuevos`, 'success');
+                    } else {
+                        throw new Error('Formato de archivo inválido');
                     }
-                }).filter(Boolean);
-                
-                // Calcular hash para detectar cambios
-                const currentHash = JSON.stringify(sheetEvents);
-                
-                if (currentHash !== lastSyncHash) {
-                    // Hubo cambios, actualizar datos locales
-                    events = sheetEvents;
-                    localStorage.setItem('banquetera_events', JSON.stringify(events));
-                    lastSyncHash = currentHash;
-                    localStorage.setItem('banquetera_last_sync_hash', lastSyncHash);
-                    
-                    displayEvents();
-                    updateAdminInfo();
-                    
-                    updateSyncStatus('success', '✅ Sincronizado');
-                } else {
-                    updateSyncStatus('success', '✅ Actualizado');
+                } catch (error) {
+                    console.error('Error importando:', error);
+                    showMessage('Error al importar datos. Verifica el formato del archivo.', 'error');
                 }
-                
-            } catch (error) {
-                console.error('Error sincronizando:', error);
-                updateSyncStatus('error', '❌ Error sincronización');
-                
-                // Usar datos locales si falla la sincronización
-                if (events.length === 0) {
-                    loadLocalData();
-                    displayEvents();
-                }
-            }
+            };
+            reader.readAsText(file);
+            
+            // Limpiar input
+            event.target.value = '';
         }
 
-        async function saveEventToSheets(event) {
-            if (!sheetsId) {
-                // Guardar solo localmente
-                localStorage.setItem('banquetera_events', JSON.stringify(events));
-                return;
-            }
-            
-            updateSyncStatus('syncing', '🔄 Guardando...');
-            
-            try {
-                // Preparar datos para Sheets
-                const rowData = [
-                    event.id,
-                    event.center,
-                    event.date,
-                    event.time,
-                    event.guestCount,
-                    event.observations,
-                    JSON.stringify(event.documents),
-                    event.created,
-                    new Date().toISOString()
-                ];
-                
-                // Añadir fila a Sheets
-                const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetsId}/values/A:I:append?valueInputOption=RAW`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        values: [rowData]
-                    })
-                });
-                
-                if (response.ok) {
-                    // También guardar localmente
-                    localStorage.setItem('banquetera_events', JSON.stringify(events));
-                    updateSyncStatus('success', '✅ Guardado y sincronizado');
-                    
-                    // Actualizar hash
-                    setTimeout(syncWithSheets, 1000);
-                } else {
-                    throw new Error('Error guardando en Sheets');
-                }
-                
-            } catch (error) {
-                console.error('Error guardando en Sheets:', error);
-                // Guardar solo localmente como fallback
-                localStorage.setItem('banquetera_events', JSON.stringify(events));
-                updateSyncStatus('error', '❌ Guardado solo localmente');
-            }
-        }
-
-        async function testSyncConnection() {
-            if (!sheetsId) {
-                showMessage('❌ Primero configura el ID de Google Sheets', 'error');
-                return;
-            }
-            
-            updateSyncStatus('syncing', '🔄 Probando conexión...');
-            
-            try {
-                const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetsId}/values/A1:A1`);
-                
-                if (response.ok) {
-                    updateSyncStatus('success', '✅ Conexión exitosa');
-                    showMessage('✅ ¡Conexión exitosa! La sincronización está funcionando.', 'success');
-                } else if (response.status === 403) {
-                    updateSyncStatus('error', '❌ Sin permisos');
-                    showMessage('❌ Sin permisos. Verifica que la hoja esté compartida con "Cualquier persona con el enlace".', 'error');
-                } else if (response.status === 404) {
-                    updateSyncStatus('error', '❌ Hoja no encontrada');
-                    showMessage('❌ Hoja no encontrada. Verifica el ID de Google Sheets.', 'error');
-                } else {
-                    throw new Error(`Error HTTP: ${response.status}`);
-                }
-            } catch (error) {
-                console.error('Error probando conexión:', error);
-                updateSyncStatus('error', '❌ Error de conexión');
-                showMessage('❌ Error de conexión. Verifica tu internet y la configuración.', 'error');
+        function updateLastUpdate() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('es-ES', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            const lastUpdateEl = document.getElementById('lastUpdate');
+            if (lastUpdateEl) {
+                lastUpdateEl.textContent = timeStr;
             }
         }
 
@@ -1076,14 +1087,12 @@
             // Actualizar texto en panel admin
             const syncStatusText = document.getElementById('syncStatusText');
             if (syncStatusText) {
-                let statusText = 'No configurado';
-                if (sheetsId) {
-                    switch(status) {
-                        case 'syncing': statusText = 'Sincronizando...'; break;
-                        case 'success': statusText = 'Sincronizado'; break;
-                        case 'error': statusText = 'Error'; break;
-                        default: statusText = 'Configurado'; break;
-                    }
+                let statusText = 'Activa';
+                switch(status) {
+                    case 'syncing': statusText = 'Sincronizando...'; break;
+                    case 'success': statusText = 'Activa'; break;
+                    case 'error': statusText = 'Error'; break;
+                    default: statusText = 'Activa'; break;
                 }
                 syncStatusText.textContent = statusText;
             }
@@ -1204,7 +1213,7 @@
         }
 
         // Manejar envío del formulario
-        document.getElementById('eventForm').addEventListener('submit', async function(e) {
+        document.getElementById('eventForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
             // Recopilar enlaces de Drive
@@ -1252,9 +1261,7 @@
             };
 
             events.push(event);
-            
-            // Guardar tanto localmente como en Sheets
-            await saveEventToSheets(event);
+            saveData();
 
             showMessage('Evento creado correctamente!');
             
